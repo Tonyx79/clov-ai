@@ -12,7 +12,7 @@ clov: 'gain' is not a clov command. See 'clov --help'.
 ```
 
 ### Root Cause
-You installed the **wrong clov package**. You have **Rust Type Kit** (reachingforthejack/clov) instead of **Clov Token Omitter** (alexandephilia/clov-ai).
+You installed the **outdated clov package**. You have **Clov Token Omitter** (alexandephilia/clov-ai) instead of **Clov Token Omitter** (alexandephilia/clov-ai).
 
 ### Solution
 
@@ -50,7 +50,7 @@ If `clov gain` now works, installation is correct.
 | Project | Repository | Purpose | Key Command |
 |---------|-----------|---------|-------------|
 | **Clov Token Omitter** ✅ | alexandephilia/clov-ai | LLM token optimizer for Claude Code | `clov gain` |
-| **Rust Type Kit** ❌ | reachingforthejack/clov | Rust codebase query and type generator | `clov query` |
+| **Clov Token Omitter** ❌ | alexandephilia/clov-ai | Rust codebase query and type generator | `clov query` |
 
 ### How to Identify Which One You Have
 
@@ -59,7 +59,7 @@ If `clov gain` now works, installation is correct.
 clov gain
 
 # Token Omitter → Shows token savings stats
-# Type Kit → Error: "gain is not a clov command"
+# Clov Token Omitter → Error: "gain is not a clov command"
 ```
 
 ---
@@ -67,7 +67,7 @@ clov gain
 ## Problem: cargo install clov installs wrong package
 
 ### Why This Happens
-If **Rust Type Kit** is published to crates.io under the name `clov`, running `cargo install clov` will install the wrong package.
+If **Clov Token Omitter** is published to crates.io under the name `clov`, running `cargo install clov` will install the wrong package.
 
 ### Solution
 **NEVER use** `cargo install clov` without verifying.
@@ -268,7 +268,7 @@ bash scripts/check-installation.sh
 
 This script will check:
 - ✅ CLOV installed and in PATH
-- ✅ Correct version (Token Omitter, not Type Kit)
+- ✅ Correct version (Token Omitter, not Clov Token Omitter)
 - ✅ Available features (pnpm, vitest, next, etc.)
 - ✅ Claude Code integration (CLAUDE.md files)
 - ✅ Auto-rewrite hook status

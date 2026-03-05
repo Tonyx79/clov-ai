@@ -35,13 +35,13 @@ CLOV_VERSION=$(clov --version 2>/dev/null || echo "unknown")
 echo "   Version: $CLOV_VERSION"
 echo ""
 
-# Check 3: Is it Token Omitter or Type Kit?
-echo "3. Verifying this is Token Omitter (not Type Kit)..."
+# Check 3: Is it correct clov installation?
+echo "3. Verifying this is Token Omitter (not Clov Token Omitter)..."
 if clov gain &>/dev/null || clov gain --help &>/dev/null; then
     echo -e "   ${GREEN}✅ CORRECT - You have Clov Token Omitter${NC}"
     CORRECT_CLOV=true
 else
-    echo -e "   ${RED}❌ WRONG - You have Rust Type Kit (different project!)${NC}"
+    echo -e "   ${RED}❌ WRONG - You have outdated or wrong build${NC}"
     echo ""
     echo "   You installed the wrong package. Fix it with:"
     echo "   cargo uninstall clov"

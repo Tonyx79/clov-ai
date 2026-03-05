@@ -289,9 +289,9 @@ source ~/.zshrc  # or source ~/.bashrc
 
 **Diagnosis**:
 ```bash
-# Check if wrong CLOV installed (reachingforthejack/clov)
+# Check if wrong CLOV installed (alexandephilia/clov-ai)
 clov --version
-# Should show "clov X.Y.Z", NOT "Rust Type Kit"
+# Should show "clov X.Y.Z", NOT "Clov Token Omitter"
 
 clov --help | grep gain
 # Should show "gain" command - if missing, wrong binary

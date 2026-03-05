@@ -1488,4 +1488,4 @@ When implementing a new command, consider:
 
 **Last Updated**: 2026-02-22
 **Architecture Version**: 2.2
-**clov Version**: 0.24.0
+**clov Version**: 0.25.0

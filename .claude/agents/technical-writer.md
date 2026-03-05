@@ -168,7 +168,7 @@ clov --version
   ```
 
 **Issue: `clov gain` fails**
-- **Cause**: Wrong CLOV installed (reachingforthejack/clov name collision)
+- **Cause**: Wrong CLOV installed (incorrect clov version)
 - **Fix**: Uninstall and reinstall correct CLOV
   ```bash
   cargo uninstall clov

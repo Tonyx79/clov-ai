@@ -19,7 +19,6 @@ clov gain              # Should work (not "command not found")
 which clov             # Verify correct binary
 ```
 
-⚠️ **Name collision**: If `clov gain` fails, you may have reachingforthejack/clov (Rust Type Kit) installed instead.
 
 ## Hook-Based Usage
 

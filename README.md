@@ -7,26 +7,6 @@
 
 clov filters and compresses command outputs before they reach your LLM context, saving 60-90% of tokens on common operations.
 
-## ⚠️ Important: Name Collision Warning
-
-**There are TWO different projects named "clov":**
-
-1. ✅ **This project (Clov Token Omitter)** - LLM token optimizer
-   - Repos: `alexandephilia/clov-ai`
-   - Purpose: Reduce Claude Code token consumption
-
-2. ❌ **reachingforthejack/clov** - Rust Type Kit (DIFFERENT PROJECT)
-   - Purpose: Query Rust codebase and generate types
-   - **DO NOT install this one if you want token optimization**
-
-**How to verify you have the correct clov:**
-
-```bash
-clov --version   # Should show "clov 0.24.0"
-clov gain        # Should show token savings stats
-```
-
-If `clov gain` doesn't exist, you installed the wrong package. See installation instructions below.
 
 ## Token Savings (30-min Claude Code Session)
 
@@ -59,7 +39,7 @@ With clov: **~45,000 tokens** → **70% reduction**
 
 ```bash
 clov --version        # Check if installed
-clov gain             # Verify it's the Token Omitter (not Type Kit)
+clov gain             # Verify it's the Token Omitter
 which clov            # Check installation path
 ```
 
@@ -68,6 +48,7 @@ If already installed and `clov gain` works, **DO NOT reinstall**. Skip to Quick 
 ### Homebrew (macOS/Linux)
 
 ```bash
+brew tap alexandephilia/clov
 brew install clov
 ```
 
@@ -92,14 +73,12 @@ clov gain  # Must show token savings stats (not "command not found")
 ### Alternative: Manual Installation
 
 ```bash
-# From clov-ai upstream (maintained by pszymkowiak)
 cargo install --git https://github.com/alexandephilia/clov-ai
 
 # OR if published to crates.io
 cargo install clov
 ```
 
-⚠️ **WARNING**: `cargo install clov` from crates.io might install the wrong package (Type Kit instead of Token Omitter). Always verify with `clov gain` after installation.
 
 ### Alternative: Pre-built Binaries
 

@@ -8,21 +8,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a fork with critical fixes for git argument parsing and modern JavaScript stack support (pnpm, vitest, Next.js, TypeScript, Playwright, Prisma).
 
-### ⚠️ Name Collision Warning
-
-**Two different "clov" projects exist:**
-
-- ✅ **This project**: Clov Token Omitter (clov-ai/clov)
-- ❌ **reachingforthejack/clov**: Rust Type Kit (DIFFERENT - generates Rust types)
-
-**Verify correct installation:**
-
-```bash
-clov --version  # Should show "clov 0.24.0" (or newer)
-clov gain       # Should show token savings stats (NOT "command not found")
-```
-
-If `clov gain` fails, you have the wrong package installed.
 
 ## Development Commands
 
