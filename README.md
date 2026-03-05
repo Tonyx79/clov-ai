@@ -8,6 +8,8 @@
 
 clov filters and compresses command outputs before they reach your LLM context, saving 60-90% of tokens on common operations.
 
+![clov preview 2](preview2.jpg)
+
 
 ## Token Savings (30-min Claude Code Session)
 
