@@ -1,6 +1,6 @@
 #!/bin/sh
 # clov installer - https://github.com/alexandephilia/clov-ai
-# Usage: curl -fsSL https://raw.githubusercontent.com/alexandephilia/clov-ai/refs/heads/master/install.sh | sh
+# Usage: curl -fsSL https://raw.githubusercontent.com/alexandephilia/clov-ai/refs/heads/main/install.sh | sh
 
 set -e
 

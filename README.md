@@ -64,7 +64,7 @@ curl -fsSL https://raw.githubusercontent.com/alexandephilia/clov-ai/refs/heads/m
 > echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc  # or ~/.zshrc
 > ```
 
-After installation, **verify you have the correct clov**:
+After installation, **verify clov is working**:
 
 ```bash
 clov gain  # Must show token savings stats (not "command not found")
@@ -75,8 +75,6 @@ clov gain  # Must show token savings stats (not "command not found")
 ```bash
 cargo install --git https://github.com/alexandephilia/clov-ai
 
-# OR if published to crates.io
-cargo install clov
 ```
 
 

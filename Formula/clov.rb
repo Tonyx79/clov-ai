@@ -2,11 +2,11 @@
 # frozen_string_literal: true
 
 # Homebrew formula for clov - Clov Token Omitter
-# To install: brew tap clov-ai/tap && brew install clov
+# To install: brew tap alexandephilia/clov && brew install clov
 class Clov < Formula
   desc "High-performance CLI proxy to minimize LLM token consumption"
   homepage "https://github.com/alexandephilia/clov-ai"
-  version "0.1.0"
+  version "0.25.0"
   license "MIT"
 
   on_macos do
@@ -17,7 +17,7 @@ class Clov < Formula
 
     on_arm do
       url "https://github.com/alexandephilia/clov-ai/releases/download/v#{version}/clov-aarch64-apple-darwin.tar.gz"
-      sha256 "PLACEHOLDER_SHA256_ARM"
+      sha256 "ecb289919abee1e74abb502e2eaa34236fd68bb39c45db1773f498898bdeecc5"
     end
   end
 

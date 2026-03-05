@@ -2,7 +2,7 @@
 name = "clov"
 version = "0.25.0"
 edition = "2021"
-authors = ["Patrick Szymkowiak"]
+authors = ["alexandephilia"]
 description = "Clov Token Omitter - High-performance CLI proxy to minimize LLM token consumption"
 license = "MIT"
 homepage = "https://github.com/alexandephilia/clov-ai"
@@ -40,8 +40,8 @@ strip = true
 
 # cargo-deb configuration
 [package.metadata.deb]
-maintainer = "Patrick Szymkowiak"
-copyright = "2024 Patrick Szymkowiak"
+maintainer = "alexandephilia"
+copyright = "2025 alexandephilia"
 license-file = ["LICENSE", "0"]
 extended-description = "clov filters and compresses command outputs before they reach your LLM context, saving 60-90% of tokens."
 section = "utility"

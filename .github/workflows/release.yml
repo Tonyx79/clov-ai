@@ -283,17 +283,17 @@ jobs:
           # Remove leading spaces from heredoc
           sed -i 's/^          //' clov.rb
 
-      - name: Push to homebrew-tap
+      - name: Push to homebrew-clov
         run: |
           CONTENT=$(base64 -w 0 clov.rb)
-          SHA=$(gh api repos/clov-ai/homebrew-tap/contents/Formula/clov.rb --jq '.sha' 2>/dev/null || echo "")
+          SHA=$(gh api repos/alexandephilia/homebrew-clov/contents/Formula/clov.rb --jq '.sha' 2>/dev/null || echo "")
           if [ -n "$SHA" ]; then
-            gh api -X PUT repos/clov-ai/homebrew-tap/contents/Formula/clov.rb \
+            gh api -X PUT repos/alexandephilia/homebrew-clov/contents/Formula/clov.rb \
               -f message="clov ${{ steps.version.outputs.version }}" \
               -f content="$CONTENT" \
               -f sha="$SHA"
           else
-            gh api -X PUT repos/clov-ai/homebrew-tap/contents/Formula/clov.rb \
+            gh api -X PUT repos/alexandephilia/homebrew-clov/contents/Formula/clov.rb \
               -f message="clov ${{ steps.version.outputs.version }}" \
               -f content="$CONTENT"
           fi
