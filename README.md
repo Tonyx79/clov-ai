@@ -324,7 +324,7 @@ Example `clov gain` output:
 
 ```
 ╔══════════════════════════════════════════════════════╗
-║           CLOV Token Savings (Global Scope)          ║
+║          CLOV Token Savings (Global Scope)           ║
 ╠══════════════════════════════════════════════════════╣
 ║  Total commands  :   133                             ║
 ║  Input tokens    :  30.5K                            ║
@@ -332,7 +332,7 @@ Example `clov gain` output:
 ║  Tokens saved    :  25.3K  (83.0%)                   ║
 ╠══════════════════════════════════════════════════════╣
 ║  By Command                                          ║
-║  ────────────────────────────────────────────────── ║
+║  ──────────────────────────────────────────────────  ║
 ║  Command               Count    Saved     Avg%       ║
 ║  clov git status          41    17.4K    82.9%       ║
 ║  clov git push            54     3.4K    91.6%       ║
@@ -340,7 +340,7 @@ Example `clov gain` output:
 ║  clov ls                  23     1.4K    37.2%       ║
 ╠══════════════════════════════════════════════════════╣
 ║  Daily Savings (last 30 days)                        ║
-║  ────────────────────────────────────────────────── ║
+║  ──────────────────────────────────────────────────  ║
 ║  01-23 │███████████████████              6.4K        ║
 ║  01-24 │██████████████████               5.9K        ║
 ║  01-25 │                                   18        ║
@@ -364,22 +364,22 @@ Example output:
 
 ```
 ╔══════════════════════════════════════════════════════════╗
-║        clov discover - Savings Opportunities             ║
+║         clov discover - Savings Opportunities            ║
 ╠══════════════════════════════════════════════════════════╣
-║  Scanned : 142 sessions · last 30 days                  ║
-║  Commands: 1,786 Bash invocations                       ║
-║  Via clov: 108  (6%)                                    ║
+║  Scanned : 142 sessions · last 30 days                   ║
+║  Commands: 1,786 Bash invocations                        ║
+║  Via clov: 108 (6%)                                      ║
 ╠══════════════════════════════════════════════════════════╣
 ║  MISSED SAVINGS - commands clov already handles          ║
 ╠══════════════════════════════════════════════════════════╣
-║  Command        Count   clov Equivalent    Est. Savings  ║
-║  ────────────────────────────────────────────────────── ║
+║  Command        Count   clov Equivalent   Est. Savings   ║
+║  ─────────────────────────────────────────────────────   ║
 ║  git log          434   clov git           ~55.9K tokens ║
 ║  cargo test       203   clov cargo         ~49.9K tokens ║
 ║  ls -la           107   clov ls            ~11.8K tokens ║
 ║  gh pr             80   clov gh            ~10.4K tokens ║
-║  ────────────────────────────────────────────────────── ║
-║  Total: 986 commands  ->  ~143.9K tokens recoverable     ║
+║  ─────────────────────────────────────────────────────   ║
+║  Total: 986 commands -> ~143.9K tokens recoverable       ║
 ╚══════════════════════════════════════════════════════════╝
 ```
 
