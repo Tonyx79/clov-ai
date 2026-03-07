@@ -7,320 +7,120 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Version](https://img.shields.io/badge/version-0.27.7-blue.svg)](https://github.com/alexandephilia/clov-ai/releases/tag/v0.27.7)
 [![Built with Rust](https://img.shields.io/badge/built_with-Rust-orange?logo=rust&logoColor=white)](https://www.rust-lang.org/)
-[![Python](https://img.shields.io/badge/Python-supported-3776AB?logo=python&logoColor=white)](#python--go)
-[![Go](https://img.shields.io/badge/Go-supported-00ADD8?logo=go&logoColor=white)](#python--go)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-integrated-7B2D8B?logo=anthropic&logoColor=white)](https://claude.ai/code)
 
-**Universal MCP Filter & CLI Proxy that slashes token costs by 60-90%.**
+**The Universal Context Optimizer for MCP Servers and AI Coders.**
 
 ![clov preview](clov_1.jpg)
 
-`clov` is a high-performance, zero-dependency universal proxy designed to solve the context-bloat problem. Unlike generic filters, `clov` intelligently handles both raw dev commands (git, cargo, npm) and complex MCP tool outputs (web search, data results). It strips ANSI noise, web chrome, and verbose technical trash before it reaches your LLM and burns your budget. Single binary. Total control.
+Model Context Protocol (MCP) servers are powerful, but they are incredibly noisy. When your AI agent uses an MCP search tool or database connector, the server often returns massive JSON blobs full of website navigation chrome, tracking parameters, and raw, untruncated arrays.
+
+`clov` is a structure-aware proxy built specifically to intercept and compress MCP tool responses _before_ they flood your LLM's context window. As a secondary feature, it also aggressively filters standard CLI development commands (git, npm, cargo, etc.).
+
+By deploying `clov` between your AI agent and its tools, you can slash token consumption by **60-95%** without sacrificing the critical data your model needs to solve complex problems. Stop burning your API budget on boilerplate.
 
 ---
 
-## Why
+## The Cost of Context Bloat
 
 ![clov savings](clov_2.jpg)
 
-A medium session without clov burns around **150,000 tokens**. With clov: roughly **45,000**. That's a real number, not marketing.
+When an AI agent performs a deep research task using an MCP server, a single tool response can easily exceed 50,000 tokens.
 
-| Command                        | Raw tokens   | With clov   | Cut     |
-| ------------------------------ | ------------ | ----------- | ------- |
-| `ls` / `tree` (×10)            | 2,000        | 400         | 80%     |
-| `cat` / file reads (×20)       | 40,000       | 12,000      | 70%     |
-| `grep` / `rg` (×8)             | 16,000       | 3,200       | 80%     |
-| `git status` (×10)             | 3,000        | 600         | 80%     |
-| `git diff` (×5)                | 10,000       | 2,500       | 75%     |
-| `git log` (×5)                 | 2,500        | 500         | 80%     |
-| `git add/commit/push` (×8)     | 1,600        | 120         | 92%     |
-| `cargo test` / `npm test` (×5) | 25,000       | 2,500       | 90%     |
-| `ruff check` (×3)              | 3,000        | 600         | 80%     |
-| `pytest` (×4)                  | 8,000        | 800         | 90%     |
-| `go test` (×3)                 | 6,000        | 600         | 90%     |
-| `docker ps` (×3)               | 900          | 180         | 80%     |
-| **MCP Tool Results** (×5)      | **~50,000**  | **~3,500**  | **93%** |
-| **Total**                      | **~168,000** | **~27,400** | **84%** |
+With `clov`'s Universal MCP Filtering, these blobs are intelligently pruned:
 
-> Based on medium TypeScript/Rust projects. Actual savings vary.
+| Operation                           | Raw Tokens | With clov | Cut     |
+| ----------------------------------- | ---------- | --------- | ------- |
+| **MCP Web Search Results**          | 65,000     | 4,500     | **93%** |
+| **MCP Structured Data Retrieval**   | 40,000     | 5,000     | **87%** |
+| **CLI: Test Suites (`cargo test`)** | 25,000     | 2,500     | **90%** |
+| **CLI: Git Status / Diffs**         | 13,000     | 3,100     | **75%** |
+| **CLI: Linters (`eslint`, `tsc`)**  | 15,000     | 3,000     | **80%** |
+
+_Based on real-world AI coding sessions using standard MCP architectures and medium-sized codebases._
 
 ---
 
-## Install
-
-### Check first (seriously)
-
-If `clov` is already on your machine:
+## 🚀 Quick Install
 
 ```bash
-clov --version   # installed?
-clov gain        # is it actually clov, or some other binary?
-which clov       # where does it live?
-```
-
-If `clov gain` prints stats, you are done. Go to [Setup](#setup).
-
-### Homebrew
-
-```bash
+# Homebrew (macOS/Linux)
 brew tap alexandephilia/clov
 brew install clov
-```
 
-### Curl installer
+# Cargo
+cargo install --git https://github.com/alexandephilia/clov-ai
 
-```bash
+# Direct bash installer
 curl -fsSL https://raw.githubusercontent.com/alexandephilia/clov-ai/refs/heads/main/install.sh | sh
 ```
 
-Installs to `~/.local/bin`. If that is not in your PATH:
-
-```bash
-echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc  # or ~/.bashrc
-```
-
-Then verify:
-
-```bash
-clov gain   # must print stats, not "command not found"
-```
-
-### Cargo
-
-```bash
-cargo install --git https://github.com/alexandephilia/clov-ai
-```
-
-### Pre-built binaries
-
-Grab from [releases](https://github.com/alexandephilia/clov-ai/releases):
-
-- macOS: `clov-x86_64-apple-darwin.tar.gz` / `clov-aarch64-apple-darwin.tar.gz`
-- Linux: `clov-x86_64-unknown-linux-gnu.tar.gz` / `clov-aarch64-unknown-linux-gnu.tar.gz`
-- Windows: `clov-x86_64-pc-windows-msvc.zip`
+_(Check releases for pre-built Windows, macOS, and Linux binaries)._
 
 ---
 
-## Setup
+## 🔌 Universal MCP Integration
 
-```bash
-# Hook-first install (recommended)
-clov init --global
-# Installs the rewrite hook + a 10-line CLOV.md reference
-# Follow the printed instructions to register it in ~/.claude/settings.json
+To optimize your MCP servers, simply wrap their execution command with `clov mcp proxy`. `clov` acts as a transparent JSON-RPC layer, analyzing the responses structurally.
 
-# Confirm it is wired up
-clov init --show
-clov git status   # should produce compact output
-
-# Alternative modes:
-clov init --global --claude-md  # full 137-line injection into CLAUDE.md (legacy)
-clov init                       # local project only
-```
-
-**v0.25.0**: The hook-first mode removes ~2,000 tokens of setup boilerplate from Claude's context while keeping full coverage through automatic command rewriting.
-
----
-
-## How It Works
-
-```
-without clov:   model <──────── shell output  (~2,000 tokens)
-
-with clov:      model <── clov <── shell output  (~200 tokens)
-                           filter
-```
-
-Four strategies:
-
-1. **Filtering** — strips ANSI codes, blank lines, boilerplate, progress noise
-2. **Grouping** — collapses related items (errors by file, packages by type)
-3. **Truncation** — keeps context, cuts repetition
-4. **Deduplication** — repeated log lines become single entries with counts
-
----
-
-## Global Flags
-
-```bash
--u, --ultra-compact   # icon-only format, maximum savings
--v, --verbose         # show more (-v, -vv, -vvv)
-```
-
----
-
-## Commands
-
-### Files
-
-```bash
-clov ls .                        # compact directory tree
-clov tree .                      # tree view
-clov read file.rs                # filtered file read
-clov read file.rs -l aggressive  # signatures only, strips bodies
-clov smart file.rs               # 2-line heuristic summary
-clov find "*.rs" .               # compact find output
-clov grep "pattern" .            # grouped by file
-```
-
-### Git
-
-```bash
-clov git status                  # compact: "3 modified, 1 untracked"
-clov git log -n 10               # one line per commit
-clov git diff                    # condensed diff
-clov git add .                   # -> "ok ✓"
-clov git commit -m "msg"         # -> "ok ✓ abc1234"
-clov git push                    # -> "ok ✓ main"
-clov git pull                    # -> "ok ✓ 3 files +10 -2"
-clov git stash                   # compact stash output
-clov git worktree list           # compact worktree list
-```
-
-### Graphite (gt)
-
-Stacked PR workflows with the same token-optimized output:
-
-```bash
-clov gt log                      # compact stack graph, strips emails
-clov gt log short                # short format passthrough
-clov gt submit                   # push summary: "pushed feat/x, created PR #42"
-clov gt sync                     # sync summary: "ok sync: 2 synced, 1 deleted"
-clov gt restack                  # restack summary: "ok restacked 3 branches"
-clov gt create                   # create summary: "ok created feat/new-feature"
-clov gt branch                   # branch info
-clov gt status                   # routes through git filter
-```
-
-### Test & Build
-
-```bash
-clov test cargo test             # failures only (90% reduction)
-clov err npm run build           # errors and warnings only
-clov cargo test                  # compact cargo test output
-clov cargo build                 # errors only on failure
-clov cargo clippy                # grouped lint output
-```
-
-### GitHub CLI
-
-```bash
-clov gh pr list                  # compact PR table
-clov gh pr view 42               # PR details + check summary
-clov gh issue list               # compact issue table
-clov gh run list                 # workflow run status
-```
-
-### MCP Tools (Exa, etc.)
-
-Filter bloated MCP tool responses before they reach your LLM context. 85-95% token savings on web-heavy results:
-
-```bash
-clov mcp proxy <mcp-command>     # JSON-aware proxy with request ID tracking
-```
-
-**Universal Filtering**:
-
-- Content structure detection automatically identifies Web Search, Code, Structured Data, or Text
-- Universally strips navigation, footers, and tracking params across _all_ MCP search tools (Exa, Brave, etc.)
-- Parses internal JSON text results and scales truncation limits adaptively by density
-
-**Setup**:
-Update your `~/.claude/settings.json` to route MCP servers through clov:
+Configure your AI agent (e.g., in `~/.claude/settings.json` for Claude Code):
 
 ```json
 "mcpServers": {
-  "exa": {
+  "generic-search": {
     "command": "clov",
-    "args": ["mcp", "proxy", "npx", "-y", "exa-mcp-server"]
+    "args": ["mcp", "proxy", "npx", "-y", "some-mcp-server"]
+  },
+  "database-connector": {
+    "command": "clov",
+    "args": ["mcp", "proxy", "python", "-m", "db_mcp"]
   }
 }
 ```
 
-### JavaScript / TypeScript
+### How the Universal Filter Works:
+
+1. **Content Detection**: Automatically identifies if a response contains Web Search data, Raw Code, Structured JSON arrays, or Plain Text.
+2. **Chrome Stripping**: Heuristically removes website navigation headers, footers, ad blocks, and tracking URLs from search results across _all_ providers.
+3. **Adaptive Truncation**: Scales truncation limits dynamically based on the information density of the internal text.
+
+---
+
+## 💻 CLI Proxy Integration
+
+In addition to orchestrating MCP servers, `clov` optimizes standard shell commands. If you use Claude Code, `clov` can inject an auto-rewrite hook to automatically filter terminal output without modifying your prompt.
 
 ```bash
-clov lint                        # ESLint grouped by rule/file (84% reduction)
-clov lint biome                  # works with Biome too
-clov tsc                         # TypeScript errors grouped by file (83% reduction)
-clov next build                  # Next.js build metrics only (87% reduction)
-clov prettier --check .          # files that need formatting (70% reduction)
-clov vitest run                  # failures only (99.5% reduction)
-clov playwright test             # E2E failures only (94% reduction)
-clov prisma generate             # schema output without ASCII art (88% reduction)
-clov prisma migrate dev --name x
-clov prisma db-push
-clov npm run build               # strips npm boilerplate
-clov npx tsc                     # routes through tsc filter
-clov pnpm list                   # compact dependency tree (70-90% reduction)
-clov pnpm outdated
-clov pnpm install
+# Register the auto-rewrite hook globally
+clov init --global
 ```
 
-### Python / Go
+By installing the hook, your AI agent can issue commands like `git log`, `npm test`, or `cargo clippy`, and `clov` will silently intercept them, stripping ANSI codes, progress bars, and successful test output, returning only the errors and summaries to the model.
+
+### Supported CLI Toolchains
+
+- **Git & GitHub CLI**: Condensed statuses, diffs, PR listings.
+- **JavaScript / TypeScript**: `npm`, `pnpm`, `eslint`, `tsc`, `Next.js`, `vitest`, `playwright`, `prisma`.
+- **Rust**: `cargo test`, `cargo build`, `cargo clippy`.
+- **Python**: `pytest`, `ruff`, `mypy`, `pip`.
+- **Go**: `go test`, `go build`, `golangci-lint`.
+- **Infra**: `docker`, `kubectl`, `aws sts`.
+
+_Any unrecognized command simply passes through unchanged._
+
+---
+
+## 📊 Analytics & Tracking
+
+Curious how many tokens you've saved? `clov` tracks your session economics locally.
 
 ```bash
-# Python
-clov ruff check                  # JSON output, grouped (80% reduction)
-clov ruff format                 # files changed only
-clov pytest                      # failures only, state machine parser (90% reduction)
-clov mypy                        # grouped by file/error code (80% reduction)
-clov pip list                    # auto-detects uv (70% reduction)
-clov pip install <pkg>
-clov pip outdated                # (85% reduction)
-
-# Go
-clov go test                     # NDJSON streaming (90% reduction)
-clov go build                    # errors only (80% reduction)
-clov go vet                      # vet issues (75% reduction)
-clov golangci-lint run           # JSON grouped by rule (85% reduction)
+clov gain             # Summary of total tokens saved
+clov gain --graph     # Visual savings chart over 30 days
+clov gain --all       # Daily, weekly, and monthly breakdowns
 ```
 
-### Infrastructure
-
-```bash
-clov docker ps                   # compact container list
-clov docker images               # compact image list
-clov docker logs <container>     # deduplicated
-clov docker compose up
-clov kubectl pods                # compact pod list
-clov kubectl logs <pod>          # deduplicated
-clov kubectl services
-clov aws sts get-caller-identity # force JSON, compress
-clov psql <args>                 # strip borders, compact tables
-clov curl <url>                  # auto-JSON detection, schema output
-```
-
-### Data
-
-```bash
-clov json config.json            # structure without values
-clov json config.json -d 3      # depth limit
-clov deps                        # dependency summary
-clov env -f AWS                  # filtered env vars (sensitive masked)
-clov log app.log                 # deduplicated log stream
-clov wc file.txt                 # compact word/line/byte count
-clov wget <url>                  # download, strips progress bars
-clov diff file1 file2            # changed lines only
-clov summary <cmd>               # run command, show heuristic summary
-```
-
-### Analytics
-
-```bash
-clov gain                        # session summary + total exec time
-clov gain --graph                # ASCII savings graph, last 30 days
-clov gain --history              # recent 10 commands
-clov gain --quota --tier 20x     # monthly quota analysis (pro/5x/20x)
-clov gain --daily                # day-by-day breakdown
-clov gain --weekly               # week-by-week
-clov gain --monthly              # month-by-month
-clov gain --all                  # all breakdowns
-clov gain --all --format json    # JSON export
-clov gain --all --format csv     # CSV export
-```
-
-Example `clov gain` output:
+**Example output:**
 
 ```
 ╔══════════════════════════════════════════════════════╗
@@ -330,328 +130,38 @@ Example `clov gain` output:
 ║  Input tokens    :  30.5K                            ║
 ║  Output tokens   :  10.7K                            ║
 ║  Tokens saved    :  25.3K  (83.0%)                   ║
-╠══════════════════════════════════════════════════════╣
-║  By Command                                          ║
-║  ──────────────────────────────────────────────────  ║
-║  Command               Count    Saved     Avg%       ║
-║  clov git status          41    17.4K    82.9%       ║
-║  clov git push            54     3.4K    91.6%       ║
-║  clov grep                15     3.2K    26.5%       ║
-║  clov ls                  23     1.4K    37.2%       ║
-╠══════════════════════════════════════════════════════╣
-║  Daily Savings (last 30 days)                        ║
-║  ──────────────────────────────────────────────────  ║
-║  01-23 │███████████████████              6.4K        ║
-║  01-24 │██████████████████               5.9K        ║
-║  01-25 │                                   18        ║
-║  01-26 │████████████████████████████████ 13.0K       ║
 ╚══════════════════════════════════════════════════════╝
 ```
 
-### Discover
+---
 
-Scans your Claude Code session history and shows where you wasted tokens running commands raw when clov could have handled them:
+## Configuration & Advanced Usage
 
-```bash
-clov discover                    # current project, last 30 days
-clov discover --all              # all Claude Code projects
-clov discover --all --since 7    # last 7 days across all projects
-clov discover -p myproject       # filter by project name
-clov discover --format json
-```
-
-Example output:
-
-```
-╔══════════════════════════════════════════════════════════╗
-║         clov discover - Savings Opportunities            ║
-╠══════════════════════════════════════════════════════════╣
-║  Scanned : 142 sessions · last 30 days                   ║
-║  Commands: 1,786 Bash invocations                        ║
-║  Via clov: 108 (6%)                                      ║
-╠══════════════════════════════════════════════════════════╣
-║  MISSED SAVINGS - commands clov already handles          ║
-╠══════════════════════════════════════════════════════════╣
-║  Command        Count   clov Equivalent   Est. Savings   ║
-║  ─────────────────────────────────────────────────────   ║
-║  git log          434   clov git           ~55.9K tokens ║
-║  cargo test       203   clov cargo         ~49.9K tokens ║
-║  ls -la           107   clov ls            ~11.8K tokens ║
-║  gh pr             80   clov gh            ~10.4K tokens ║
-║  ─────────────────────────────────────────────────────   ║
-║  Total: 986 commands -> ~143.9K tokens recoverable       ║
-╚══════════════════════════════════════════════════════════╝
-```
-
-### Learn
-
-Scans Claude Code error history and extracts CLI correction patterns — commands that failed and were retried with fixes. Useful for building project-level rules:
+`clov` works perfectly out of the box, but you can configure tracking databases and output telemetry via environment variables or `~/.config/clov/config.toml`.
 
 ```bash
-clov learn                       # current project, last 30 days
-clov learn --all                 # all projects
-clov learn --write-rules         # generate .claude/rules/cli-corrections.md
-clov learn --min-confidence 0.8  # higher confidence threshold
+clov config --create    # Generate default config
+clov verify             # Check hook integrity
+clov discover           # Scan AI conversation history for missed savings
 ```
 
-### Misc
+### Unfiltered Recovery (Tee Mode)
 
-```bash
-clov proxy git log --oneline -20 # bypass filtering, still tracks usage
-clov verify                      # check hook integrity (SHA-256)
-clov hook-audit --since 7        # hook rewrite metrics (needs CLOV_HOOK_AUDIT=1)
-clov cc-economics                # Claude spend vs clov savings side-by-side
-clov config                      # show current config
-clov config --create             # generate ~/.config/clov/config.toml
-clov init --show                 # show hook status and settings.json registration
-```
+If `clov` aggressively filters a test failure and the LLM needs more detail, `clov` saves the pristine output to a temporary log file. The LLM is provided a one-line path to the full log, meaning it can read the raw data if absolutely necessary, entirely circumventing the "silent failure" problem in AI coding.
 
 ---
 
-## Auto-Rewrite Hook
+## Documentation
 
-CLAUDE.md instructions get ignored by subagents. The hook doesn't. It intercepts Bash commands at the shell level before execution, so clov runs regardless of whether the agent read your instructions.
-
-```
-Claude issues: "git status"
-       |
-       v
-clov-rewrite.sh  ->  "clov git status"  (silent, before shell)
-       |
-       v
-clov filters output, Claude gets: "3 modified, 1 untracked ✓"
-```
-
-**Coverage**: 100% across all subagents and conversations. Zero token overhead in context.
-
-### Commands Rewritten
-
-```
-git           -> clov git ...
-gh            -> clov gh ...
-cargo         -> clov cargo ...
-cat           -> clov read ...
-rg / grep     -> clov grep ...
-ls            -> clov ls
-gt            -> clov gt ...
-vitest        -> clov vitest run
-tsc           -> clov tsc
-eslint        -> clov lint
-prettier      -> clov prettier
-playwright    -> clov playwright
-prisma        -> clov prisma
-ruff          -> clov ruff ...
-pytest        -> clov pytest
-pip           -> clov pip ...
-go            -> clov go ...
-golangci-lint -> clov golangci-lint run
-docker        -> clov docker ...
-kubectl       -> clov kubectl ...
-curl          -> clov curl
-pnpm          -> clov pnpm ...
-```
-
-Commands already using `clov`, heredocs, and unrecognized commands pass through unchanged.
-
-### Quick Install
-
-```bash
-clov init -g
-# Installs hook to ~/.claude/hooks/clov-rewrite.sh
-# Creates ~/.claude/CLOV.md (10 lines)
-# Adds @CLOV.md reference to ~/.claude/CLAUDE.md
-# Prompts to patch settings.json [y/N] — say yes
-
-# Verify
-clov init --show
-```
-
-Settings.json patching options:
-
-```bash
-clov init -g                 # default: prompts [y/N]
-clov init -g --auto-patch    # patch immediately, no prompt
-clov init -g --no-patch      # skip patching, print manual snippet
-```
-
-**Restart Claude Code after install.** Without the restart, the hook is registered but not active.
-
-### Manual Install
-
-If automatic patching fails:
-
-```bash
-# 1. Install hook file
-clov init -g --no-patch  # prints JSON snippet
-
-# 2. Add snippet to ~/.claude/settings.json manually
-
-# 3. Restart Claude Code
-```
-
-Full manual:
-
-```bash
-mkdir -p ~/.claude/hooks
-cp .claude/hooks/clov-rewrite.sh ~/.claude/hooks/clov-rewrite.sh
-chmod +x ~/.claude/hooks/clov-rewrite.sh
-```
-
-Add to `~/.claude/settings.json`:
-
-```json
-{
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/clov-rewrite.sh"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-### Suggest Hook (Audit Mode)
-
-Prefer visibility over silent rewrites? The suggest hook detects clov-compatible commands and emits a system reminder instead of rewriting:
-
-|          | Auto-Rewrite                      | Suggest                   |
-| -------- | --------------------------------- | ------------------------- |
-| Strategy | Modifies command before execution | Emits reminder to Claude  |
-| Coverage | 100% forced                       | ~70-85% (model-dependent) |
-| Use case | Production, guaranteed savings    | Auditing, learning mode   |
-
-```bash
-cp .claude/hooks/clov-suggest.sh ~/.claude/hooks/clov-suggest.sh
-chmod +x ~/.claude/hooks/clov-suggest.sh
-```
-
-Register in settings.json the same way as the rewrite hook.
-
----
-
-## Configuration
-
-### Install Modes
-
-| Command                    | Scope  | Hook | CLOV.md        | Context tokens | Use when       |
-| -------------------------- | ------ | ---- | -------------- | -------------- | -------------- |
-| `clov init -g`             | Global | yes  | yes (10 lines) | ~10            | Recommended    |
-| `clov init -g --claude-md` | Global | no   | no             | ~2,000         | Legacy compat  |
-| `clov init -g --hook-only` | Global | yes  | no             | 0              | Minimal        |
-| `clov init`                | Local  | no   | no             | ~2,000         | Single project |
-
-### Database
-
-Token tracking lives in `~/.local/share/clov/history.db` by default.
-
-Override with env var:
-
-```bash
-export CLOV_DB_PATH="/path/to/custom.db"
-```
-
-Or in `~/.config/clov/config.toml`:
-
-```toml
-[tracking]
-database_path = "/path/to/custom.db"
-```
-
-Priority: env var > config file > default.
-
-### Tee (Full Output Recovery)
-
-When clov filters a failing command, the LLM loses raw details and often re-runs the same command multiple times. Tee saves unfiltered output and prints a one-line hint so the agent reads it directly:
-
-```
-✓ cargo test: 15 passed (1 suite, 0.01s)
-[full output: ~/.local/share/clov/tee/1707753600_cargo_test.log]
-```
-
-Config (`~/.config/clov/config.toml`):
-
-```toml
-[tee]
-enabled = true
-mode = "failures"       # "failures" | "always" | "never"
-max_files = 20
-max_file_size = 1048576  # 1MB
-```
-
-Env overrides:
-
-- `CLOV_TEE=0` — disable entirely
-- `CLOV_TEE_DIR=/path` — custom output directory
-
----
-
-## Troubleshooting
-
-### settings.json patch failed
-
-```bash
-cat ~/.claude/settings.json | python3 -m json.tool  # validate JSON
-clov init -g --no-patch                              # get snippet, patch manually
-cp ~/.claude/settings.json.bak ~/.claude/settings.json  # restore backup
-```
-
-### Hook not running after install
-
-Nine times out of ten: Claude Code was not restarted.
-
-```bash
-clov init --show                         # verify hook registration
-cat ~/.claude/settings.json | grep clov-rewrite
-# then restart Claude Code
-```
-
-### Leftover files after uninstall
-
-```bash
-clov init -g --uninstall    # removes hook, CLOV.md, settings.json entry
-# or manually:
-rm ~/.claude/hooks/clov-rewrite.sh
-rm ~/.claude/CLOV.md
-cp ~/.claude/settings.json.bak ~/.claude/settings.json
-```
-
----
-
-## Uninstall
-
-```bash
-clov init -g --uninstall
-
-# Binary removal:
-cargo uninstall clov      # if installed via cargo
-brew uninstall clov       # macOS Homebrew
-sudo apt remove clov      # Debian/Ubuntu
-sudo dnf remove clov      # Fedora/RHEL
-```
-
----
-
-## Docs
-
-- [INSTALL.md](INSTALL.md) — detailed installation and PATH verification
-- [ARCHITECTURE.md](ARCHITECTURE.md) — module layout, filter strategies, performance targets
-- [CLAUDE.md](CLAUDE.md) — Claude Code integration context
-- [docs/AUDIT_GUIDE.md](docs/AUDIT_GUIDE.md) — analytics, export formats, quota estimation
+- [ARCHITECTURE.md](ARCHITECTURE.md) — The Universal Filter architecture and JSON-RPC proxy mechanics.
+- [CLAUDE.md](CLAUDE.md) — Agentic guidance for Claude Code.
+- [docs/AUDIT_GUIDE.md](docs/AUDIT_GUIDE.md) — Generating token economy exports and CSV analytics.
 
 ---
 
 ## License
 
 MIT — see [LICENSE](LICENSE).
-
----
 
 <p align="center">
   <img src="https://skillicons.dev/icons?i=rust,python,go" height="24" />
