@@ -515,4 +515,59 @@ mod tests {
         assert!(!text.contains("| detail |"));
         assert!(!text.contains("\\n"));
     }
+
+    #[test]
+    fn cleans_exa_style_quoted_articles_end_to_end() {
+        let article = concat!(
+            "> Fetch the complete documentation index at: https://code.claude.com/docs/llms.txt\\n",
+            "> Use this file to discover all available pages before exploring further.\\n",
+            ">\\n",
+            "> ## Documentation Index\\n\\n",
+            "# Orchestrate teams of Claude Code sessions\\n\\n",
+            "> Coordinate multiple Claude Code instances working together as a team, with shared tasks.\\n\\n",
+            "| | Subagents | Agent teams |\\n",
+            "| --- | --- | --- |\\n",
+            "| Context | Own context window | Fully independent |\\n\\n",
+            "```text\\n",
+            "claude --teammate-mode in-process\\n",
+            "```\\n\\n",
+            "This paragraph should survive the cleanup and stay readable at the end.\\n"
+        );
+
+        let pending = Arc::new(Mutex::new(HashMap::new()));
+        pending
+            .lock()
+            .unwrap()
+            .insert(Value::from(11), "crawling_exa".to_string());
+
+        let message = json!({
+            "jsonrpc": "2.0",
+            "id": 11,
+            "result": {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": article
+                    }
+                ]
+            }
+        });
+
+        let filtered = filter_tool_response(message, &pending, 0);
+        let text = filtered["result"]["content"][0]["text"].as_str().unwrap();
+
+        assert!(text.contains("Orchestrate teams of Claude Code sessions"));
+        assert!(text.contains("Coordinate multiple Claude Code instances working together as a team"));
+        assert!(text.contains("Subagents: Agent teams"));
+        assert!(text.contains("Context — Own context window — Fully independent"));
+        assert!(text.contains("This paragraph should survive the cleanup and stay readable at the end."));
+        assert!(!text.contains("Fetch the complete documentation index"));
+        assert!(!text.contains("Documentation Index"));
+        assert!(!text.contains("> "));
+        assert!(!text.contains("##"));
+        assert!(!text.contains("| --- |"));
+        assert!(!text.contains("```"));
+        assert!(!text.contains("claude --teammate-mode in-process"));
+        assert!(!text.contains("\\n"));
+    }
 }

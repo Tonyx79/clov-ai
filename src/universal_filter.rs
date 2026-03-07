@@ -478,11 +478,19 @@ fn cleanup_article_text(text: &str) -> String {
     let normalized = normalize_escaped_line_breaks(text);
     let mut cleaned_lines = Vec::new();
     let mut blank_run = 0usize;
+    let mut in_fenced_block = false;
 
     for raw_line in normalized.lines() {
         let trimmed = raw_line.trim();
 
-        if trimmed.is_empty() {
+        if is_fence_marker(trimmed) {
+            in_fenced_block = !in_fenced_block;
+            continue;
+        }
+
+        let unquoted = strip_markdown_quote_prefix(trimmed);
+
+        if unquoted.is_empty() {
             blank_run += 1;
             if blank_run <= 2 {
                 cleaned_lines.push(String::new());
@@ -492,17 +500,28 @@ fn cleanup_article_text(text: &str) -> String {
 
         blank_run = 0;
 
-        if is_markdown_table_separator(trimmed) {
+        if in_fenced_block {
             continue;
         }
 
-        let without_heading = ARTICLE_HEADING.replace(trimmed, "").trim().to_string();
+        if is_markdown_table_separator(&unquoted) {
+            continue;
+        }
+
+        let without_heading = ARTICLE_HEADING.replace(&unquoted, "").trim().to_string();
+        if should_drop_article_boilerplate(&without_heading) {
+            continue;
+        }
         let without_hard_breaks = without_heading.trim_end_matches('\\').trim().to_string();
         let normalized_line = if looks_like_markdown_table_row(&without_hard_breaks) {
             normalize_markdown_table_row(&without_hard_breaks)
         } else {
             without_hard_breaks
         };
+
+        if normalized_line.is_empty() {
+            continue;
+        }
 
         cleaned_lines.push(collapse_inline_spacing(&normalized_line));
     }
@@ -541,7 +560,11 @@ fn collapse_whitespace_preserving_indentation(text: &str) -> String {
 }
 
 fn looks_like_article(text: &str) -> bool {
-    if text.len() < 300 || looks_like_code(text) {
+    if text.len() < 300 {
+        return false;
+    }
+
+    if looks_like_primary_code_blob(text) {
         return false;
     }
 
@@ -561,6 +584,38 @@ fn looks_like_article(text: &str) -> bool {
     }) || text.contains("\\n");
 
     sentence_markers >= 3 && (substantial_lines >= 4 || markdown_signals)
+}
+
+fn looks_like_primary_code_blob(text: &str) -> bool {
+    let lines: Vec<&str> = text.lines().collect();
+    if lines.is_empty() {
+        return false;
+    }
+
+    let codeish_lines = lines
+        .iter()
+        .filter(|line| {
+            let trimmed = line.trim();
+            is_fence_marker(trimmed)
+                || trimmed.ends_with(';')
+                || trimmed.ends_with('{')
+                || trimmed.ends_with('}')
+                || trimmed.starts_with("fn ")
+                || trimmed.starts_with("class ")
+                || trimmed.starts_with("const ")
+                || trimmed.starts_with("let ")
+                || trimmed.starts_with("import ")
+                || trimmed.starts_with("export ")
+                || trimmed.starts_with("interface ")
+        })
+        .count();
+
+    let prose_lines = lines
+        .iter()
+        .filter(|line| line.trim().len() >= 32 && line.contains(' '))
+        .count();
+
+    codeish_lines >= 8 && codeish_lines > prose_lines
 }
 
 fn adaptive_truncation_limit(text: &str) -> usize {
@@ -679,6 +734,28 @@ fn normalize_markdown_table_row(line: &str) -> String {
         [left, right] => format!("{}: {}", left, right),
         _ => cells.join(" — "),
     }
+}
+
+fn strip_markdown_quote_prefix(line: &str) -> String {
+    let mut current = line.trim();
+
+    while let Some(rest) = current.strip_prefix('>') {
+        current = rest.trim_start();
+    }
+
+    current.to_string()
+}
+
+fn is_fence_marker(line: &str) -> bool {
+    let trimmed = line.trim();
+    trimmed.starts_with("```") || trimmed == "~~~"
+}
+
+fn should_drop_article_boilerplate(line: &str) -> bool {
+    let lowered = line.trim().to_ascii_lowercase();
+    lowered.starts_with("fetch the complete documentation index at:")
+        || lowered.starts_with("use this file to discover all available pages")
+        || lowered == "documentation index"
 }
 
 fn search_like_keys() -> &'static [&'static str] {
@@ -813,5 +890,45 @@ mod tests {
         assert!(!output.contains("| --- |"));
         assert!(!output.contains("\\n"));
         assert!(!output.contains("\\\\\n"));
+    }
+
+    #[test]
+    fn cleans_exa_quoted_article_noise() {
+        let input = concat!(
+            "> Fetch the complete documentation index at: https://code.claude.com/docs/llms.txt\\n",
+            "> Use this file to discover all available pages before exploring further.\\n",
+            ">\\n",
+            "> ## Documentation Index\\n\\n",
+            "# Orchestrate teams of Claude Code sessions\\n\\n",
+            "> Coordinate multiple Claude Code instances working together as a team.\\n\\n",
+            "## Compare with subagents\\n\\n",
+            "| | Subagents | Agent teams |\\n",
+            "| --- | --- | --- |\\n",
+            "| Context | Own context window | Fully independent |\\n\\n",
+            "```json\\n",
+            "{\\n",
+            "  \\\"env\\\": {\\n",
+            "    \\\"CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS\\\": \\\"1\\\"\\n",
+            "  }\\n",
+            "}\\n",
+            "```\\n\\n",
+            "This final paragraph explains the feature clearly in normal prose.\\n"
+        );
+
+        let output = filter_response(input, &FilterContext::default());
+
+        assert!(output.contains("Orchestrate teams of Claude Code sessions"));
+        assert!(output.contains("Coordinate multiple Claude Code instances working together as a team."));
+        assert!(output.contains("Subagents: Agent teams"));
+        assert!(output.contains("Context — Own context window — Fully independent"));
+        assert!(output.contains("This final paragraph explains the feature clearly in normal prose."));
+        assert!(!output.contains("Fetch the complete documentation index"));
+        assert!(!output.contains("Documentation Index"));
+        assert!(!output.contains("##"));
+        assert!(!output.contains("> "));
+        assert!(!output.contains("| --- |"));
+        assert!(!output.contains("```"));
+        assert!(!output.contains("CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"));
+        assert!(!output.contains("\\n"));
     }
 }
