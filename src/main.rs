@@ -18,6 +18,7 @@ mod gh_cmd;
 mod git;
 mod go_cmd;
 mod golangci_cmd;
+mod gt_cmd;
 mod grep_cmd;
 mod hook_audit_cmd;
 mod init;
@@ -584,6 +585,12 @@ enum Commands {
         command: GoCommands,
     },
 
+    /// Graphite (gt) stacked PR commands with compact output
+    Gt {
+        #[command(subcommand)]
+        command: GtCommands,
+    },
+
     /// golangci-lint with compact output
     #[command(name = "golangci-lint")]
     GolangciLint {
@@ -922,6 +929,43 @@ enum GoCommands {
         args: Vec<String>,
     },
     /// Passthrough: runs any unsupported go subcommand directly
+    #[command(external_subcommand)]
+    Other(Vec<OsString>),
+}
+
+#[derive(Subcommand)]
+enum GtCommands {
+    /// Compact stack log output
+    Log {
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<String>,
+    },
+    /// Compact submit output
+    Submit {
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<String>,
+    },
+    /// Compact sync output
+    Sync {
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<String>,
+    },
+    /// Compact restack output
+    Restack {
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<String>,
+    },
+    /// Compact create output
+    Create {
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<String>,
+    },
+    /// Branch info and management
+    Branch {
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<String>,
+    },
+    /// Passthrough: git-passthrough detection or direct gt execution
     #[command(external_subcommand)]
     Other(Vec<OsString>),
 }
@@ -1676,6 +1720,30 @@ fn main() -> Result<()> {
             }
             GoCommands::Other(args) => {
                 go_cmd::run_other(&args, cli.verbose)?;
+            }
+        },
+
+        Commands::Gt { command } => match command {
+            GtCommands::Log { args } => {
+                gt_cmd::run_log(&args, cli.verbose)?;
+            }
+            GtCommands::Submit { args } => {
+                gt_cmd::run_submit(&args, cli.verbose)?;
+            }
+            GtCommands::Sync { args } => {
+                gt_cmd::run_sync(&args, cli.verbose)?;
+            }
+            GtCommands::Restack { args } => {
+                gt_cmd::run_restack(&args, cli.verbose)?;
+            }
+            GtCommands::Create { args } => {
+                gt_cmd::run_create(&args, cli.verbose)?;
+            }
+            GtCommands::Branch { args } => {
+                gt_cmd::run_branch(&args, cli.verbose)?;
+            }
+            GtCommands::Other(args) => {
+                gt_cmd::run_other(&args, cli.verbose)?;
             }
         },
 
