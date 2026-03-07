@@ -1,4 +1,4 @@
-# CLOV - Context Optimizer for MCP Servers & AI Development
+# CLOV - Context Optimizer for MCP & Dev Tooling
 
 <p align="center">
   <img src="assets/clov_mascot.png" width="400" alt="clov mascot">
@@ -154,12 +154,3 @@ MIT License — see [LICENSE](LICENSE).
   <br/><br/>
   <sub>Authored by <a href="https://github.com/alexandephilia">@alexandephilia</a> × claude</sub>
 </p>
-
-```text
-       ██████╗ ██╗      ██████╗ ██╗   ██╗
-      ██╔════╝ ██║     ██╔═══██╗██║   ██║
-      ██║      ██║     ██║   ██║██║   ██║
-      ██║      ██║     ██║   ██║╚██╗ ██╔╝
-      ╚██████╗ ███████╗╚██████╔╝ ╚████╔╝
-       ╚═════╝ ╚══════╝ ╚═════╝   ╚═══╝
-```
