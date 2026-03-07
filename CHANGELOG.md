@@ -236,7 +236,7 @@ breakage, but future rule additions won't take effect until they migrate.
 ### Bug Fixes
 
 * add website URL (clov-ai.app) across project metadata ([#81](https://github.com/alexandephilia/clov-ai/issues/81)) ([c84fa3c](https://github.com/alexandephilia/clov-ai/commit/c84fa3c060c7acccaedb617852938c894f30f81e))
-* update stale repo URLs from pszymkowiak/clov to alexandephilia/clov-ai ([#78](https://github.com/alexandephilia/clov-ai/issues/78)) ([55d010a](https://github.com/alexandephilia/clov-ai/commit/55d010ad5eced14f525e659f9f35d051644a1246))
+* update stale repo URLs across project ([#78](https://github.com/alexandephilia/clov-ai/issues/78)) ([55d010a](https://github.com/alexandephilia/clov-ai/commit/55d010ad5eced14f525e659f9f35d051644a1246))
 
 ## [0.13.1](https://github.com/alexandephilia/clov-ai/compare/v0.13.0...v0.13.1) (2026-02-12)
 
@@ -366,7 +366,7 @@ breakage, but future rule additions won't take effect until they migrate.
 * add comprehensive security review workflow for PRs ([1ca6e81](https://github.com/alexandephilia/clov-ai/commit/1ca6e81bdf16a7eab503d52b342846c3519d89ff))
 * add comprehensive security review workflow for PRs ([66101eb](https://github.com/alexandephilia/clov-ai/commit/66101ebb65076359a1530d8f19e11a17c268bce2))
 
-## [0.7.1](https://github.com/pszymkowiak/clov/compare/v0.7.0...v0.7.1) (2026-02-02)
+## [0.7.1](https://github.com/alexandephilia/clov-ai/compare/v0.7.0...v0.7.1) (2026-02-02)
 
 
 ### Features
@@ -405,98 +405,98 @@ breakage, but future rule additions won't take effect until they migrate.
 * add execution time tracking test guide (TEST_EXEC_TIME.md)
 * comprehensive parser infrastructure documentation (src/parser/README.md)
 
-## [0.7.0](https://github.com/pszymkowiak/clov/compare/v0.6.0...v0.7.0) (2026-02-01)
+## [0.7.0](https://github.com/alexandephilia/clov-ai/compare/v0.6.0...v0.7.0) (2026-02-01)
 
 
 ### Features
 
-* add discover command, auto-rewrite hook, and git show support ([ff1c759](https://github.com/pszymkowiak/clov/commit/ff1c7598c240ca69ab51f507fe45d99d339152a0))
-* discover command, auto-rewrite hook, git show ([c9c64cf](https://github.com/pszymkowiak/clov/commit/c9c64cfd30e2c867ce1df4be508415635d20132d))
+* add discover command, auto-rewrite hook, and git show support (ff1c759)
+* discover command, auto-rewrite hook, git show (c9c64cf)
 
 
 ### Bug Fixes
 
-* forward args in clov git push/pull to support -u, remote, branch ([4bb0130](https://github.com/pszymkowiak/clov/commit/4bb0130695ad2f5d91123afac2e3303e510b240c))
+* forward args in clov git push/pull to support -u, remote, branch (4bb0130)
 
-## [0.6.0](https://github.com/pszymkowiak/clov/compare/v0.5.2...v0.6.0) (2026-02-01)
+## [0.6.0](https://github.com/alexandephilia/clov-ai/compare/v0.5.2...v0.6.0) (2026-02-01)
 
 
 ### Features
 
-* cargo build/test/clippy with compact output ([bfd5646](https://github.com/pszymkowiak/clov/commit/bfd5646f4eac32b46dbec05f923352a3e50c19ef))
-* curl with auto-JSON detection ([314accb](https://github.com/pszymkowiak/clov/commit/314accbfd9ac82cc050155c6c47dfb76acab14ce))
-* gh pr create/merge/diff/comment/edit + gh api ([517a93d](https://github.com/pszymkowiak/clov/commit/517a93d0e4497414efe7486410c72afdad5f8a26))
-* git branch, fetch, stash, worktree commands ([bc31da8](https://github.com/pszymkowiak/clov/commit/bc31da8ad9d9e91eee8af8020e5bd7008da95dd2))
-* npm/npx routing, pnpm build/typecheck, --skip-env flag ([49b3cf2](https://github.com/pszymkowiak/clov/commit/49b3cf293d856ff3001c46cff8fee9de9ef501c5))
-* shared infrastructure for new commands ([6c60888](https://github.com/pszymkowiak/clov/commit/6c608880e9ecbb2b3569f875e7fad37d1184d751))
-* shared infrastructure for new commands ([9dbc117](https://github.com/pszymkowiak/clov/commit/9dbc1178e7f7fab8a0695b624ed3744ab1a8bf02))
+* cargo build/test/clippy with compact output (bfd5646)
+* curl with auto-JSON detection (314accb)
+* gh pr create/merge/diff/comment/edit + gh api (517a93d)
+* git branch, fetch, stash, worktree commands (bc31da8)
+* npm/npx routing, pnpm build/typecheck, --skip-env flag (49b3cf2)
+* shared infrastructure for new commands (6c60888)
+* shared infrastructure for new commands (9dbc117)
 
-## [0.5.2](https://github.com/pszymkowiak/clov/compare/v0.5.1...v0.5.2) (2026-01-30)
-
-
-### Bug Fixes
-
-* release pipeline trigger and version-agnostic package URLs ([108d0b5](https://github.com/pszymkowiak/clov/commit/108d0b5ea316ab33c6998fb57b2caf8c65ebe3ef))
-* release pipeline trigger and version-agnostic package URLs ([264539c](https://github.com/pszymkowiak/clov/commit/264539cf20a29de0d9a1a39029c04cb8eb1b8f10))
-
-## [0.5.1](https://github.com/pszymkowiak/clov/compare/v0.5.0...v0.5.1) (2026-01-30)
+## [0.5.2](https://github.com/alexandephilia/clov-ai/compare/v0.5.1...v0.5.2) (2026-01-30)
 
 
 ### Bug Fixes
 
-* 3 issues (latest tag, ccusage fallback, versioning) ([d773ec3](https://github.com/pszymkowiak/clov/commit/d773ec3ea515441e6c62bbac829f45660cfaccde))
-* patrick's 3 issues (latest tag, ccusage fallback, versioning) ([9e322e2](https://github.com/pszymkowiak/clov/commit/9e322e2aee9f7239cf04ce1bf9971920035ac4bb))
+* release pipeline trigger and version-agnostic package URLs (108d0b5)
+* release pipeline trigger and version-agnostic package URLs (264539c)
 
-## [0.5.0](https://github.com/pszymkowiak/clov/compare/v0.4.0...v0.5.0) (2026-01-30)
+## [0.5.1](https://github.com/alexandephilia/clov-ai/compare/v0.5.0...v0.5.1) (2026-01-30)
+
+
+### Bug Fixes
+
+* 3 issues (latest tag, ccusage fallback, versioning) (d773ec3)
+* 3 issues (latest tag, ccusage fallback, versioning) (9e322e2)
+
+## [0.5.0](https://github.com/alexandephilia/clov-ai/compare/v0.4.0...v0.5.0) (2026-01-30)
 
 
 ### Features
 
-* add comprehensive claude code economics analysis ([ec1cf9a](https://github.com/pszymkowiak/clov/commit/ec1cf9a56dd52565516823f55f99a205cfc04558))
-* comprehensive economics analysis and code quality improvements ([8e72e7a](https://github.com/pszymkowiak/clov/commit/8e72e7a8b8ac7e94e9b13958d8b6b8e9bf630660))
+* add comprehensive claude code economics analysis (ec1cf9a)
+* comprehensive economics analysis and code quality improvements (8e72e7a)
 
 
 ### Bug Fixes
 
-* comprehensive code quality improvements ([5b840cc](https://github.com/pszymkowiak/clov/commit/5b840cca492ea32488d8c80fd50d3802a0c41c72))
-* optimize HashMap merge and add safety checks ([3b847f8](https://github.com/pszymkowiak/clov/commit/3b847f863a90b2e9a9b7eb570f700a376bce8b22))
+* comprehensive code quality improvements (5b840cc)
+* optimize HashMap merge and add safety checks (3b847f8)
 
-## [0.4.0](https://github.com/pszymkowiak/clov/compare/v0.3.1...v0.4.0) (2026-01-30)
+## [0.4.0](https://github.com/alexandephilia/clov-ai/compare/v0.3.1...v0.4.0) (2026-01-30)
 
 
 ### Features
 
-* add comprehensive temporal audit system for token savings analytics ([76703ca](https://github.com/pszymkowiak/clov/commit/76703ca3f5d73d3345c2ed26e4de86e6df815aff))
-* Comprehensive Temporal Audit System for Token Savings Analytics ([862047e](https://github.com/pszymkowiak/clov/commit/862047e387e95b137973983b4ebad810fe5b4431))
+* add comprehensive temporal audit system for token savings analytics (76703ca)
+* Comprehensive Temporal Audit System for Token Savings Analytics (862047e)
 
-## [0.3.1](https://github.com/pszymkowiak/clov/compare/v0.3.0...v0.3.1) (2026-01-29)
+## [0.3.1](https://github.com/alexandephilia/clov-ai/compare/v0.3.0...v0.3.1) (2026-01-29)
 
 
 ### Bug Fixes
 
-* improve command robustness and flag support ([c2cd691](https://github.com/pszymkowiak/clov/commit/c2cd691c823c8b1dd20d50d01486664f7fd7bd28))
-* improve command robustness and flag support ([d7d8c65](https://github.com/pszymkowiak/clov/commit/d7d8c65b86d44792e30ce3d0aff9d90af0dd49ed))
+* improve command robustness and flag support (c2cd691)
+* improve command robustness and flag support (d7d8c65)
 
-## [0.3.0](https://github.com/pszymkowiak/clov/compare/v0.2.1...v0.3.0) (2026-01-29)
+## [0.3.0](https://github.com/alexandephilia/clov-ai/compare/v0.2.1...v0.3.0) (2026-01-29)
 
 
 ### Features
 
-* add --quota flag to clov gain with tier-based analysis ([26b314d](https://github.com/pszymkowiak/clov/commit/26b314d45b8b0a0c5c39fb0c17001ecbde9d97aa))
-* add CI/CD automation (release management and automated metrics) ([22c3017](https://github.com/pszymkowiak/clov/commit/22c3017ed5d20e5fb6531cfd7aea5e12257e3da9))
-* add GitHub CLI integration (depends on [#9](https://github.com/pszymkowiak/clov/issues/9)) ([341c485](https://github.com/pszymkowiak/clov/commit/341c48520792f81889543a5dc72e572976856bbb))
-* add GitHub CLI integration with token optimizations ([0f7418e](https://github.com/pszymkowiak/clov/commit/0f7418e958b23154cb9dcf52089a64013a666972))
-* add modern JavaScript tooling support ([b82fa85](https://github.com/pszymkowiak/clov/commit/b82fa85ae5fe0cc1f17d8acab8c6873f436a4d62))
-* add modern JavaScript tooling support (lint, tsc, next, prettier, playwright, prisma) ([88c0174](https://github.com/pszymkowiak/clov/commit/88c0174d32e0603f6c5dcc7f969fa8f988573ec6))
-* add Modern JS Stack commands to benchmark script ([b868987](https://github.com/pszymkowiak/clov/commit/b868987f6f48876bb2ce9a11c9cad12725401916))
-* add quota analysis with multi-tier support ([64c0b03](https://github.com/pszymkowiak/clov/commit/64c0b03d4e4e75a7051eac95be2d562797f1a48a))
-* add shared utils module for JS stack commands ([0fc06f9](https://github.com/pszymkowiak/clov/commit/0fc06f95098e00addf06fe71665638ab2beb1aac))
-* CI/CD automation (versioning, benchmarks, README auto-update) ([b8bbfb8](https://github.com/pszymkowiak/clov/commit/b8bbfb87b4dc2b664f64ee3b0231e346a2244055))
+* add --quota flag to clov gain with tier-based analysis (26b314d)
+* add CI/CD automation (release management and automated metrics) (22c3017)
+* add GitHub CLI integration (depends on [#9](https://github.com/alexandephilia/clov-ai/issues/9)) (341c485)
+* add GitHub CLI integration with token optimizations (0f7418e)
+* add modern JavaScript tooling support (b82fa85)
+* add modern JavaScript tooling support (lint, tsc, next, prettier, playwright, prisma) (88c0174)
+* add Modern JS Stack commands to benchmark script (b868987)
+* add quota analysis with multi-tier support (64c0b03)
+* add shared utils module for JS stack commands (0fc06f9)
+* CI/CD automation (versioning, benchmarks, README auto-update) (b8bbfb8)
 
 
 ### Bug Fixes
 
-* **ci:** correct rust-toolchain action name ([9526471](https://github.com/pszymkowiak/clov/commit/9526471530b7d272f32aca38ace7548fd221547e))
+* **ci:** correct rust-toolchain action name (9526471)
 
 ## [Unreleased]
 
@@ -529,9 +529,8 @@ breakage, but future rule additions won't take effect until they migrate.
 
 ## [0.2.1] - 2026-01-29
 
-See upstream: https://github.com/pszymkowiak/clov
 
 ## Links
 
-- **Repository**: https://github.com/alexandephilia/clov-ai (maintained by pszymkowiak)
+- **Repository**: https://github.com/alexandephilia/clov-ai (maintained by alexandephilia)
 - **Issues**: https://github.com/alexandephilia/clov-ai/issues

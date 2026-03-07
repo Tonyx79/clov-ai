@@ -4,7 +4,7 @@
 
 If you discover a security vulnerability in CLOV, please report it to the maintainers privately:
 
-- **Email**: security@clov-ai.dev (or create a private security advisory on GitHub)
+- **Email**: 4lexander31@gmail.com (or create a private security advisory on GitHub)
 - **Response time**: We aim to acknowledge reports within 48 hours
 - **Disclosure**: We follow responsible disclosure practices (90-day embargo)
 
@@ -208,9 +208,9 @@ Critical vulnerabilities (remote code execution, data exfiltration) may be fast-
 
 ## Contact
 
-- **Security issues**: security@clov-ai.dev
+- **Security issues**: 4lexander31@gmail.com
 - **General questions**: https://github.com/alexandephilia/clov-ai/discussions
-- **Maintainers**: @FlorianBruniaux (active fork maintainer)
+- **Maintainers**: @alexandephilia, @claude
 
 ---
 
