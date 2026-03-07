@@ -48,7 +48,10 @@ pub fn run_proxy(
     verbose: u8,
 ) -> Result<()> {
     if verbose > 0 {
-        eprintln!("[clov-mcp] Starting proxy for: {} {:?}", server_cmd, server_args);
+        eprintln!(
+            "[clov-mcp] Starting proxy for: {} {:?}",
+            server_cmd, server_args
+        );
     }
 
     // Spawn the real MCP server
@@ -58,11 +61,15 @@ pub fn run_proxy(
         .stdout(Stdio::piped())
         .stderr(Stdio::inherit()) // pass server logs through
         .spawn()
-        .with_context(|| format!("Failed to spawn MCP server: {} {:?}", server_cmd, server_args))?;
+        .with_context(|| {
+            format!(
+                "Failed to spawn MCP server: {} {:?}",
+                server_cmd, server_args
+            )
+        })?;
 
     // Request ID → tool name mapping for response routing
-    let pending_requests: Arc<Mutex<HashMap<Value, String>>> =
-        Arc::new(Mutex::new(HashMap::new()));
+    let pending_requests: Arc<Mutex<HashMap<Value, String>>> = Arc::new(Mutex::new(HashMap::new()));
 
     // Take ownership of child's stdin/stdout
     let child_stdin = child
@@ -76,9 +83,8 @@ pub fn run_proxy(
 
     // Thread 1: Client stdin → Child stdin (forward requests)
     let pending_clone = Arc::clone(&pending_requests);
-    let stdin_thread = thread::spawn(move || {
-        forward_client_to_server(child_stdin, pending_clone, verbose)
-    });
+    let stdin_thread =
+        thread::spawn(move || forward_client_to_server(child_stdin, pending_clone, verbose));
 
     // Main thread: Child stdout → Client stdout (filter responses)
     let result = forward_server_to_client(child_stdout, &pending_requests, no_filter, verbose);
@@ -179,11 +185,7 @@ fn forward_server_to_client(
 /// ```
 /// We store `5 → "web_search_exa"` so when response ID=5 arrives, we know
 /// which filter to apply.
-fn track_tool_call_request(
-    msg: &Value,
-    pending: &Arc<Mutex<HashMap<Value, String>>>,
-    verbose: u8,
-) {
+fn track_tool_call_request(msg: &Value, pending: &Arc<Mutex<HashMap<Value, String>>>, verbose: u8) {
     let method = msg.get("method").and_then(|m| m.as_str());
     let id = msg.get("id");
     let tool_name = msg
@@ -250,9 +252,7 @@ fn filter_tool_response(
                         if let Some(text) = item.get("text").and_then(|t| t.as_str()) {
                             total_input += text.len();
 
-                            if let Some(filtered) =
-                                mcp_filters::filter_for_tool(&tool_name, text)
-                            {
+                            if let Some(filtered) = mcp_filters::filter_for_tool(&tool_name, text) {
                                 total_output += filtered.len();
                                 item["text"] = Value::String(filtered);
                             } else {
@@ -288,6 +288,7 @@ fn filter_tool_response(
 /// - "id": <some value>
 /// - "result" field (success) or "error" field (failure)
 /// - NO "method" field (that would make it a request)
+#[cfg(test)]
 pub fn is_tool_call_response(msg: &Value) -> bool {
     msg.get("id").is_some()
         && (msg.get("result").is_some() || msg.get("error").is_some())
@@ -374,9 +375,7 @@ mod tests {
         });
 
         let filtered = filter_tool_response(response, &pending, 0);
-        let text = filtered["result"]["content"][0]["text"]
-            .as_str()
-            .unwrap();
+        let text = filtered["result"]["content"][0]["text"].as_str().unwrap();
         assert!(text.contains("Actual search result content"));
         assert!(!text.contains("Skip to main content"));
         assert!(!text.contains("Cookie"));

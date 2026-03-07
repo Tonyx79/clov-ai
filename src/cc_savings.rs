@@ -14,8 +14,6 @@ use crate::utils::{format_cpt, format_tokens, format_usd};
 
 // ── Constants ──
 
-const BILLION: f64 = 1e9;
-
 // API pricing ratios (verified Feb 2026, consistent across Claude models <=200K context)
 // Source: https://docs.anthropic.com/en/docs/about-claude/models
 const WEIGHT_OUTPUT: f64 = 5.0; // Output = 5x input
@@ -387,7 +385,8 @@ fn compute_totals(periods: &[PeriodSavings]) -> Totals {
     // Compute global dual metrics (legacy)
     if totals.cc_total_tokens > 0 {
         totals.blended_cpt = Some(totals.cc_cost / totals.cc_total_tokens as f64);
-        totals.savings_blended = Some(totals.clov_saved_tokens as f64 * totals.blended_cpt.unwrap());
+        totals.savings_blended =
+            Some(totals.clov_saved_tokens as f64 * totals.blended_cpt.unwrap());
     }
     if totals.cc_active_tokens > 0 {
         totals.active_cpt = Some(totals.cc_cost / totals.cc_active_tokens as f64);
@@ -404,7 +403,10 @@ fn compute_totals(periods: &[PeriodSavings]) -> Totals {
 fn box_line(content: &str, inner_width: usize) -> String {
     let len = content.chars().count();
     if len >= inner_width {
-        format!("  │{}│", content.chars().take(inner_width).collect::<String>())
+        format!(
+            "  │{}│",
+            content.chars().take(inner_width).collect::<String>()
+        )
     } else {
         format!("  │{}{}│", content, " ".repeat(inner_width - len))
     }

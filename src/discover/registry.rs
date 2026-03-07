@@ -445,7 +445,9 @@ fn rewrite_segment(seg: &str) -> Option<String> {
 
     // Use classify_command for correct ignore/prefix handling
     let clov_equivalent = match classify_command(trimmed) {
-        Classification::Supported { clov_equivalent, .. } => clov_equivalent,
+        Classification::Supported {
+            clov_equivalent, ..
+        } => clov_equivalent,
         _ => return None,
     };
 
@@ -807,7 +809,10 @@ mod tests {
 
     #[test]
     fn test_rewrite_gt_restack() {
-        assert_eq!(rewrite_command("gt restack"), Some("clov gt restack".into()));
+        assert_eq!(
+            rewrite_command("gt restack"),
+            Some("clov gt restack".into())
+        );
     }
 
     #[test]
@@ -815,7 +820,8 @@ mod tests {
         let result = classify_command("gt log");
         assert!(
             matches!(result, Classification::Supported { clov_equivalent, .. } if clov_equivalent == "clov gt"),
-            "gt log should classify as Supported(clov gt), got {:?}", result
+            "gt log should classify as Supported(clov gt), got {:?}",
+            result
         );
     }
 
@@ -823,7 +829,10 @@ mod tests {
 
     #[test]
     fn test_rewrite_git_status() {
-        assert_eq!(rewrite_command("git status"), Some("clov git status".into()));
+        assert_eq!(
+            rewrite_command("git status"),
+            Some("clov git status".into())
+        );
     }
 
     #[test]
@@ -836,7 +845,10 @@ mod tests {
 
     #[test]
     fn test_rewrite_cargo_test() {
-        assert_eq!(rewrite_command("cargo test"), Some("clov cargo test".into()));
+        assert_eq!(
+            rewrite_command("cargo test"),
+            Some("clov cargo test".into())
+        );
     }
 
     #[test]
@@ -851,7 +863,9 @@ mod tests {
     fn test_rewrite_compound_three_segments() {
         assert_eq!(
             rewrite_command("cargo fmt --all && cargo clippy --all-targets && cargo test"),
-            Some("clov cargo fmt --all && clov cargo clippy --all-targets && clov cargo test".into())
+            Some(
+                "clov cargo fmt --all && clov cargo clippy --all-targets && clov cargo test".into()
+            )
         );
     }
 
@@ -1441,7 +1455,10 @@ mod tests {
 
     #[test]
     fn test_rewrite_vitest() {
-        assert_eq!(rewrite_command("vitest run"), Some("clov vitest run".into()));
+        assert_eq!(
+            rewrite_command("vitest run"),
+            Some("clov vitest run".into())
+        );
     }
 
     #[test]

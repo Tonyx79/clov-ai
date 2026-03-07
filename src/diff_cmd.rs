@@ -42,7 +42,9 @@ pub fn run(file1: &Path, file2: &Path, verbose: u8) -> Result<()> {
     for change in diff.changes.iter().take(50) {
         match change {
             DiffChange::Added(ln, c) => clov.push_str(&format!("+{:4} {}\n", ln, truncate(c, 80))),
-            DiffChange::Removed(ln, c) => clov.push_str(&format!("-{:4} {}\n", ln, truncate(c, 80))),
+            DiffChange::Removed(ln, c) => {
+                clov.push_str(&format!("-{:4} {}\n", ln, truncate(c, 80)))
+            }
             DiffChange::Modified(ln, old, new) => clov.push_str(&format!(
                 "~{:4} {} → {}\n",
                 ln,

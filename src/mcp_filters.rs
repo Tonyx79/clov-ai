@@ -67,7 +67,8 @@ pub fn filter_exa_search(text: &str) -> String {
                         let cleaned = strip_web_chrome(inner_text);
                         let cleaned = collapse_whitespace(&cleaned);
                         let cleaned = clean_urls(&cleaned);
-                        *text_val = Value::String(truncate_content(&cleaned, SEARCH_RESULT_MAX_CHARS));
+                        *text_val =
+                            Value::String(truncate_content(&cleaned, SEARCH_RESULT_MAX_CHARS));
                     }
                 }
             }
@@ -131,8 +132,10 @@ pub fn filter_for_tool(tool_name: &str, text: &str) -> Option<String> {
         "crawling_exa" => Some(filter_exa_crawl(text)),
         "get_code_context_exa" => Some(filter_exa_code(text)),
         // These tools have structured/short output, no filtering needed
-        "company_research_exa" | "people_search_exa"
-        | "deep_researcher_start" | "deep_researcher_check" => None,
+        "company_research_exa"
+        | "people_search_exa"
+        | "deep_researcher_start"
+        | "deep_researcher_check" => None,
         _ => None,
     }
 }
@@ -223,10 +226,7 @@ fn truncate_content(text: &str, max_chars: usize) -> String {
     let break_point = truncated.rfind('\n').unwrap_or(max_chars);
     let mut result = text[..break_point].to_string();
     let remaining = text.len() - break_point;
-    result.push_str(&format!(
-        "\n\n[... {} chars truncated by clov]",
-        remaining
-    ));
+    result.push_str(&format!("\n\n[... {} chars truncated by clov]", remaining));
     result
 }
 
@@ -309,7 +309,8 @@ mod tests {
 
     #[test]
     fn test_strip_markdown_nav() {
-        let input = "[Home](/) [About](/about) [Blog](/blog) [Contact](/contact)\n\nActual content here.";
+        let input =
+            "[Home](/) [About](/about) [Blog](/blog) [Contact](/contact)\n\nActual content here.";
         let result = strip_markdown_nav(input);
         assert!(!result.contains("[Home]"));
         assert!(result.contains("Actual content here."));

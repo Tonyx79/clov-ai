@@ -29,6 +29,7 @@ pub enum ParseResult<T> {
 
 impl<T> ParseResult<T> {
     /// Unwrap the parsed data, panicking on Passthrough
+    #[cfg_attr(not(test), allow(dead_code))]
     pub fn unwrap(self) -> T {
         match self {
             ParseResult::Full(data) => data,
@@ -38,6 +39,7 @@ impl<T> ParseResult<T> {
     }
 
     /// Get the tier level (1 = Full, 2 = Degraded, 3 = Passthrough)
+    #[cfg_attr(not(test), allow(dead_code))]
     pub fn tier(&self) -> u8 {
         match self {
             ParseResult::Full(_) => 1,
@@ -47,11 +49,13 @@ impl<T> ParseResult<T> {
     }
 
     /// Check if parsing succeeded (Full or Degraded)
+    #[cfg_attr(not(test), allow(dead_code))]
     pub fn is_ok(&self) -> bool {
         !matches!(self, ParseResult::Passthrough(_))
     }
 
     /// Map the parsed data while preserving tier
+    #[cfg_attr(not(test), allow(dead_code))]
     pub fn map<U, F>(self, f: F) -> ParseResult<U>
     where
         F: FnOnce(T) -> U,
@@ -64,6 +68,7 @@ impl<T> ParseResult<T> {
     }
 
     /// Get warnings if Degraded tier
+    #[cfg_attr(not(test), allow(dead_code))]
     pub fn warnings(&self) -> Vec<String> {
         match self {
             ParseResult::Degraded(_, warnings) => warnings.clone(),
@@ -85,6 +90,7 @@ pub trait OutputParser: Sized {
     fn parse(input: &str) -> ParseResult<Self::Output>;
 
     /// Parse with explicit tier preference (for testing/debugging)
+    #[allow(dead_code)]
     fn parse_with_tier(input: &str, max_tier: u8) -> ParseResult<Self::Output> {
         let result = Self::parse(input);
         if result.tier() > max_tier {
