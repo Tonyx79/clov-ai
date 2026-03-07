@@ -183,6 +183,16 @@ If `clov` aggressively intercepts a test failure and the AI actually needs the u
 
 ---
 
+## Acknowledgments
+
+CLOV includes derivative work based on [rtk-ai/rtk](https://github.com/rtk-ai/rtk), an MIT-licensed project focused on token optimization for AI coding workflows.
+
+This project extends that foundation with a Rust implementation, MCP proxy support, structured-response filtering, dynamic truncation controls, and local telemetry integrations.
+
+Upstream RTK attribution and bundled license text are included in [LICENSES/RTK-MIT-LICENSE](LICENSES/RTK-MIT-LICENSE).
+
+---
+
 ## License
 
 MIT License — see [LICENSE](LICENSE).
