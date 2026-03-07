@@ -4,13 +4,13 @@ on:
   workflow_call:
     inputs:
       tag:
-        description: 'Tag to release'
+        description: "Tag to release"
         required: true
         type: string
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Tag to release (e.g., v0.25.0)'
+        description: "Tag to release (e.g., v0.25.0)"
         required: true
 
 permissions:
@@ -104,7 +104,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Install cargo-deb
-        run: cargo install cargo-deb
+        uses: taiki-e/install-action@cargo-deb
 
       - name: Build DEB
         run: cargo deb
@@ -118,17 +118,20 @@ jobs:
   build-rpm:
     name: Build RPM package
     runs-on: ubuntu-latest
-    container: fedora:latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install dependencies
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install rpm-build
         run: |
-          dnf install -y rust cargo rpm-build
+          sudo apt-get update
+          sudo apt-get install -y rpm
 
       - name: Install cargo-generate-rpm
-        run: cargo install cargo-generate-rpm
+        uses: taiki-e/install-action@cargo-generate-rpm
 
       - name: Build release
         run: cargo build --release
