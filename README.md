@@ -11,11 +11,11 @@
 [![Go](https://img.shields.io/badge/Go-supported-00ADD8?logo=go&logoColor=white)](#python--go)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-integrated-7B2D8B?logo=anthropic&logoColor=white)](https://claude.ai/code)
 
-**A shell filter that keeps token costs sane.**
+**Universal MCP Filter & CLI Proxy that slashes token costs by 60-90%.**
 
 ![clov preview](clov_1.jpg)
 
-Your shell dumps thousands of tokens into Claude's context every session. Progress bars. ANSI codes. Timestamps. Verbose git output nobody asked for. clov intercepts that garbage before it reaches the model and hands back only what matters — hashes, failures, errors. One install. Every session.
+`clov` is a high-performance, zero-dependency universal proxy designed to solve the context-bloat problem. Unlike generic filters, `clov` intelligently handles both raw dev commands (git, cargo, npm) and complex MCP tool outputs (web search, data results). It strips ANSI noise, web chrome, and verbose technical trash before it reaches your LLM and burns your budget. Single binary. Total control.
 
 ---
 
