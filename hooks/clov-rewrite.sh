@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # CLOV Claude Code hook — rewrites commands to use clov for token savings.
-# Requires: clov >= 0.23.0, jq
+# Requires: clov >= 0.26.0, jq
 #
 # This is a thin delegating hook: all rewrite logic lives in `clov rewrite`,
 # which is the single source of truth (src/discover/registry.rs).
@@ -14,15 +14,15 @@ if ! command -v clov &>/dev/null; then
   exit 0
 fi
 
-# Version guard: clov rewrite was added in 0.23.0.
+# Version guard: gt support + cc-savings added in 0.26.0.
 # Older binaries: warn once and exit cleanly (no silent failure).
 CLOV_VERSION=$(clov --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
 if [ -n "$CLOV_VERSION" ]; then
   MAJOR=$(echo "$CLOV_VERSION" | cut -d. -f1)
   MINOR=$(echo "$CLOV_VERSION" | cut -d. -f2)
-  # Require >= 0.23.0
-  if [ "$MAJOR" -eq 0 ] && [ "$MINOR" -lt 23 ]; then
-    echo "[clov] WARNING: clov $CLOV_VERSION is too old (need >= 0.23.0). Upgrade: cargo install clov" >&2
+  # Require >= 0.26.0
+  if [ "$MAJOR" -eq 0 ] && [ "$MINOR" -lt 26 ]; then
+    echo "[clov] WARNING: clov $CLOV_VERSION is too old (need >= 0.26.0). Upgrade: brew upgrade clov" >&2
     exit 0
   fi
 fi
