@@ -1,14 +1,14 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) and other coding agents when working with code in this repository.
 
 ## Project Overview
 
-**clov (Clov Token Omitter)** v0.27.7 is a high-performance CLI proxy that minimizes LLM token consumption by filtering and compressing command outputs. It achieves 60-90% token savings on common development operations through smart filtering, grouping, truncation, and deduplication.
+**clov (Clov Token Omitter)** is a high-performance CLI proxy that minimizes LLM token consumption by filtering and compressing command outputs. It achieves 60-90% token savings on common development operations through smart filtering, grouping, truncation, and deduplication.
 
 This is a fork with critical fixes for git argument parsing and modern JavaScript stack support (pnpm, vitest, Next.js, TypeScript, Playwright, Prisma).
 
-**NEW (v0.26.4)**: Universal MCP Proxy. Integrated JSON-RPC stdio proxy for filtering bloated MCP tool responses with 85-95% token savings.
+**Current MCP capability**: Universal MCP proxying with JSON-aware filtering, structured-data reduction, request ID tracking, and stdio framing support (`Content-Length` plus newline-delimited payloads).
 
 ## Development Commands
 
@@ -447,12 +447,57 @@ Release profile (Cargo.toml:31-36):
 
 ## CI/CD
 
-GitHub Actions workflow (.github/workflows/release.yml):
+GitHub Actions workflows:
 
+- `.github/workflows/release-please.yml`: canonical release automation entrypoint
+- `.github/workflows/release.yml`: reusable packaging workflow invoked by release-please
 - Multi-platform builds (macOS, Linux x86_64/ARM64, Windows)
 - DEB/RPM package generation
-- Automated releases on version tags (v\*)
 - Checksums for binary verification
+
+## Release Workflow (Mandatory)
+
+**Do not manually create git tags or GitHub releases for this repo.**
+
+The correct release flow is:
+
+1. Commit code changes to `main` with a conventional commit message (`fix: ...`, `feat: ...`, `chore: ...`)
+2. Push `main`
+3. Wait for `release-please.yml` to open or update the release PR
+4. Review and merge the release PR
+5. Wait for the downstream packaging jobs from `release.yml` to finish
+6. Verify the release asset list before saying the release is done
+
+**Allowed commands**:
+
+```bash
+# Normal code delivery
+git add <files>
+git commit -m "fix: preserve long-form MCP article content"
+git push origin main
+
+# Release verification
+gh pr list --state open
+gh pr view <release-pr-number>
+gh pr merge <release-pr-number> --merge --delete-branch
+gh run list --workflow release-please.yml --limit 5
+gh run view <run-id> --json status,conclusion,jobs,url
+gh release view <tag>
+```
+
+**Forbidden commands** unless explicitly repairing a broken pipeline:
+
+```bash
+git tag -a <tag> ...
+gh release create ...
+gh workflow run release.yml ...
+```
+
+**Definition of done for releases**:
+
+- release PR merged
+- release workflow finished
+- `gh release view <tag>` shows packaged assets, not just the default source archives
 
 ## Build Verification (Mandatory)
 
