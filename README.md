@@ -1,13 +1,26 @@
-# clov: Token Omitter for LLM Workflows
+# clov — Token Omitter for LLM Workflows
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Version](https://img.shields.io/badge/version-0.25.0-blue.svg)](https://github.com/alexandephilia/clov-ai/releases/tag/v0.25.0)
+[![Built with Rust](https://img.shields.io/badge/built_with-Rust-orange?logo=rust&logoColor=white)](https://www.rust-lang.org/)
+[![CI](https://github.com/alexandephilia/clov-ai/actions/workflows/release.yml/badge.svg)](https://github.com/alexandephilia/clov-ai/actions/workflows/release.yml)
+<br>
+[![macOS](https://img.shields.io/badge/macOS-supported-black?logo=apple&logoColor=white)](https://github.com/alexandephilia/clov-ai/releases)
+[![Linux](https://img.shields.io/badge/Linux-supported-FCC624?logo=linux&logoColor=black)](https://github.com/alexandephilia/clov-ai/releases)
+[![Windows](https://img.shields.io/badge/Windows-supported-0078D4?logo=windows&logoColor=white)](https://github.com/alexandephilia/clov-ai/releases)
+<br>
+[![TypeScript](https://img.shields.io/badge/TypeScript-supported-3178C6?logo=typescript&logoColor=white)](#javascript-and-typescript-stack)
+[![Next.js](https://img.shields.io/badge/Next.js-supported-black?logo=next.js&logoColor=white)](#javascript-and-typescript-stack)
+[![Python](https://img.shields.io/badge/Python-supported-3776AB?logo=python&logoColor=white)](#python-and-go-stack)
+[![Go](https://img.shields.io/badge/Go-supported-00ADD8?logo=go&logoColor=white)](#python-and-go-stack)
+[![Docker](https://img.shields.io/badge/Docker-supported-2496ED?logo=docker&logoColor=white)](#containers)
+[![Claude Code](https://img.shields.io/badge/Claude_Code-integrated-7B2D8B?logo=anthropic&logoColor=white)](https://claude.ai/code)
 
-**A CLI proxy that stops your shell from dumping crap into your LLM context.**
+**Stop feeding your LLM a wall of shell garbage. clov filters it down to what actually matters.**
 
 ![clov preview](img_1.jpg)
 
-clov sits between your shell and your model. It intercepts command output, cuts the noise, and hands back only what actually matters. Token reduction varies by command and project, but you will notice the difference pretty damn fast.
+clov sits between your shell and your model. It intercepts command output, strips the noise, and returns only what matters — commit hashes, test failures, build errors. Not the 200 lines of progress bars and timestamps nobody asked for. Token reduction hits 60–90% on most dev operations, and you will notice it immediately.
 
 ## Token Savings (30-min Claude Code Session, Yes It's Real)
 
