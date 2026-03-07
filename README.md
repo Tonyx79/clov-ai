@@ -39,7 +39,8 @@ A medium session without clov burns around **150,000 tokens**. With clov: roughl
 | `pytest` (×4)                  | 8,000        | 800         | 90%     |
 | `go test` (×3)                 | 6,000        | 600         | 90%     |
 | `docker ps` (×3)               | 900          | 180         | 80%     |
-| **Total**                      | **~118,000** | **~23,900** | **80%** |
+| **MCP Tool Results** (×5)      | **~50,000**  | **~3,500**  | **93%** |
+| **Total**                      | **~168,000** | **~27,400** | **84%** |
 
 > Based on medium TypeScript/Rust projects. Actual savings vary.
 
