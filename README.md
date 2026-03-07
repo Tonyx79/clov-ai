@@ -60,7 +60,7 @@ _(Pre-compiled binaries for all architectures are available in standard releases
 
 ## MCP Universal Filtering
 
-To armor your MCP servers, simply wrap their invocation command with the `clov mcp proxy` bridge. `clov` operates as a transparent JSON-RPC layer, analyzing the structural payload on the wire.
+To armor your MCP servers, wrap their invocation command with the `clov mcp proxy` bridge. `clov` operates as a transparent JSON-RPC layer, handling MCP stdio framing (`Content-Length` and newline-delimited payloads) and compacting both text and structured tool results on the wire.
 
 Configuration example for your AI agent (e.g., `~/.claude/settings.json`):
 
@@ -79,9 +79,10 @@ Configuration example for your AI agent (e.g., `~/.claude/settings.json`):
 
 ### The Universal AI Logic:
 
-1. **Dynamic Content Classification**: Sequences the data to identify Web DOM, Raw Source Code, Structured Data Arrays, or NLP Text.
-2. **Aggressive Chrome Stripping**: Slices out website headers, footers, ad-tags, and tracking analytics precisely and universally.
-3. **Density-Aware Truncation**: Intelligently auto-scales data limits based purely on the information density of the internal sequences.
+1. **Dynamic Content Classification**: Identifies web/search payloads, code, structured data, and plain text without server-specific hardcoding.
+2. **Aggressive Chrome Stripping**: Removes navigation, footers, ad markers, and other low-signal page chrome from textual payloads.
+3. **Structured Data Reduction**: Samples large arrays, keeps high-signal keys, and inserts explicit truncation summaries instead of dumping raw connector output.
+4. **Density-Aware Truncation**: Auto-scales truncation limits based on payload density while preserving code shape and useful context.
 
 ---
 

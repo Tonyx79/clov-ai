@@ -110,6 +110,10 @@ Files:
 
 For tool-level optimization, clov acts as a JSON-RPC proxy for MCP servers.
 
+The proxy accepts both common MCP stdio framing styles:
+- `Content-Length` framed JSON-RPC messages
+- newline-delimited JSON payloads used by some local tooling
+
 ```
 
 ┌────────────────────────────────────────────────────────────────────────┐
@@ -128,8 +132,10 @@ Claude Code (Client) clov (Proxy) MCP Server (Child)
 │ │◄────────────────────────│ ◄──────────┘
 │ │ │
 │ │ JSON-Aware Filtering │
-│ │ • Parse results.text │
+│ │ • Parse framed MCP payload │
+│ │ • Filter `content`, `structuredContent`, `data` │
 │ │ • Strip nav chrome │
+│ │ • Summarize large arrays / trim low-signal fields │
 │ │ • Truncate to limit │
 │ │ │
 │ Filtered Response ◄──────│ │
