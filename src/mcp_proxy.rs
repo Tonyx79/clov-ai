@@ -356,7 +356,9 @@ fn filter_content_item(item: &mut Value, context: &crate::universal_filter::Filt
 fn estimate_value_size(value: &Value) -> usize {
     match value {
         Value::String(text) => text.len(),
-        _ => serde_json::to_string(value).map(|text| text.len()).unwrap_or(0),
+        _ => serde_json::to_string(value)
+            .map(|text| text.len())
+            .unwrap_or(0),
     }
 }
 
@@ -461,10 +463,56 @@ mod tests {
 
         proxy_client_to_server(Cursor::new(input), &mut output, Arc::clone(&pending), 0).unwrap();
 
-        assert_eq!(String::from_utf8(output).unwrap(), String::from_utf8(input.to_vec()).unwrap());
+        assert_eq!(
+            String::from_utf8(output).unwrap(),
+            String::from_utf8(input.to_vec()).unwrap()
+        );
         assert_eq!(
             pending.lock().unwrap().get(&Value::from(1)).cloned(),
             Some("search".to_string())
         );
+    }
+
+    #[test]
+    fn preserves_more_article_text_and_cleans_readability_noise() {
+        let article = (1..=120)
+            .map(|idx| {
+                format!(
+                    "## Part {idx:03}\\nThis section explains the MCP cleanup in a readable way.\\n| detail | retained value {idx:03} |\\n"
+                )
+            })
+            .collect::<Vec<_>>()
+            .join("\\n");
+
+        let pending = Arc::new(Mutex::new(HashMap::new()));
+        pending
+            .lock()
+            .unwrap()
+            .insert(Value::from(9), "web_search".to_string());
+
+        let message = json!({
+            "jsonrpc": "2.0",
+            "id": 9,
+            "result": {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": article
+                    }
+                ]
+            }
+        });
+
+        let filtered = filter_tool_response(message, &pending, 0);
+        let text = filtered["result"]["content"][0]["text"].as_str().unwrap();
+
+        assert!(
+            text.contains("Part 110"),
+            "late article text was truncated too early: {text}"
+        );
+        assert!(text.contains("detail: retained value 110"));
+        assert!(!text.contains("## Part"));
+        assert!(!text.contains("| detail |"));
+        assert!(!text.contains("\\n"));
     }
 }

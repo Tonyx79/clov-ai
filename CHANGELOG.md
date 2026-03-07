@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.29.4](https://github.com/alexandephilia/clov-ai/compare/v0.29.3...v0.29.4) (2026-03-08)
+
+### Bug Fixes
+
+* preserve more long-form article text from MCP fetches while cleaning markdown table and escaped-line-break noise
+* add regression coverage for long-form readability cleanup in MCP responses
+
 ## [0.29.3](https://github.com/alexandephilia/clov-ai/compare/v0.29.2...v0.29.3) (2026-03-08)
 
 ### Bug Fixes

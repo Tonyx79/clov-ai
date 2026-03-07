@@ -11,8 +11,6 @@ use serde_json::{Map, Value};
 
 const DEFAULT_MAX_ARRAY_ITEMS: usize = 8;
 const DEFAULT_MAX_OBJECT_KEYS: usize = 12;
-const DEFAULT_MAX_STRING_CHARS: usize = 8_000;
-
 pub struct FilterContext {
     pub max_tokens: usize,
     pub preserve_code: bool,
@@ -58,7 +56,7 @@ fn filter_object(map: &mut Map<String, Value>, context: &FilterContext) {
 
     for key in text_like_keys() {
         if let Some(Value::String(text)) = map.get_mut(*key) {
-            *text = filter_text_for_key(text, context, *key, &content_type);
+            *text = filter_text_for_key(text, context, key, &content_type);
         }
     }
 
@@ -351,7 +349,7 @@ fn filter_text_for_key(
 
     if matches!(key, "html" | "body" | "content") && looks_like_html(text) {
         let cleaned = strip_universal_chrome(text);
-        return filter_by_token_budget(&cleaned, context.max_tokens);
+        return filter_long_form_text(&cleaned, context);
     }
 
     filter_text_content(text, context)
@@ -363,8 +361,21 @@ fn filter_text_content(text: &str, context: &FilterContext) -> String {
     } else {
         text.to_string()
     };
-    let limit = adaptive_truncation_limit(&cleaned);
-    filter_by_token_budget(&cleaned, context.max_tokens.min(limit))
+
+    filter_long_form_text(&cleaned, context)
+}
+
+fn filter_long_form_text(text: &str, context: &FilterContext) -> String {
+    let normalized_article = normalize_escaped_line_breaks(text);
+
+    if looks_like_article(&normalized_article) {
+        let cleaned = cleanup_article_text(&normalized_article);
+        let article_budget = context.max_tokens.max(3000);
+        return filter_by_token_budget(&cleaned, article_budget);
+    }
+
+    let limit = adaptive_truncation_limit(text);
+    filter_by_token_budget(text, context.max_tokens.min(limit))
 }
 
 fn filter_code_content(text: &str, context: &FilterContext) -> String {
@@ -458,13 +469,55 @@ fn seems_like_meaningful_content(line: &str) -> bool {
 }
 
 fn collapse_whitespace(text: &str) -> String {
-    lazy_static! {
-        static ref MULTIPLE_BLANKS: Regex = Regex::new(r"\n{4,}").unwrap();
-        static ref MULTIPLE_SPACES: Regex = Regex::new(r"[ \t]{3,}").unwrap();
-    }
     let result = MULTIPLE_BLANKS.replace_all(text, "\n\n");
     let result = MULTIPLE_SPACES.replace_all(&result, " ");
     result.trim().to_string()
+}
+
+fn cleanup_article_text(text: &str) -> String {
+    let normalized = normalize_escaped_line_breaks(text);
+    let mut cleaned_lines = Vec::new();
+    let mut blank_run = 0usize;
+
+    for raw_line in normalized.lines() {
+        let trimmed = raw_line.trim();
+
+        if trimmed.is_empty() {
+            blank_run += 1;
+            if blank_run <= 2 {
+                cleaned_lines.push(String::new());
+            }
+            continue;
+        }
+
+        blank_run = 0;
+
+        if is_markdown_table_separator(trimmed) {
+            continue;
+        }
+
+        let without_heading = ARTICLE_HEADING.replace(trimmed, "").trim().to_string();
+        let without_hard_breaks = without_heading.trim_end_matches('\\').trim().to_string();
+        let normalized_line = if looks_like_markdown_table_row(&without_hard_breaks) {
+            normalize_markdown_table_row(&without_hard_breaks)
+        } else {
+            without_hard_breaks
+        };
+
+        cleaned_lines.push(collapse_inline_spacing(&normalized_line));
+    }
+
+    collapse_whitespace(&cleaned_lines.join("\n"))
+}
+
+fn collapse_inline_spacing(text: &str) -> String {
+    MULTIPLE_SPACES.replace_all(text, " ").trim().to_string()
+}
+
+fn normalize_escaped_line_breaks(text: &str) -> String {
+    text.replace("\\r\\n", "\n")
+        .replace("\\n", "\n")
+        .replace("\\r", "\n")
 }
 
 fn collapse_whitespace_preserving_indentation(text: &str) -> String {
@@ -487,6 +540,29 @@ fn collapse_whitespace_preserving_indentation(text: &str) -> String {
     collapsed.join("\n").trim().to_string()
 }
 
+fn looks_like_article(text: &str) -> bool {
+    if text.len() < 300 || looks_like_code(text) {
+        return false;
+    }
+
+    let sentence_markers = text.matches(". ").count()
+        + text.matches("! ").count()
+        + text.matches("? ").count()
+        + text
+            .lines()
+            .filter(|line| line.trim_end().ends_with('.'))
+            .count();
+    let substantial_lines = text.lines().filter(|line| line.trim().len() >= 24).count();
+    let markdown_signals = text.lines().any(|line| {
+        let trimmed = line.trim();
+        ARTICLE_HEADING.is_match(trimmed)
+            || looks_like_markdown_table_row(trimmed)
+            || trimmed.ends_with('\\')
+    }) || text.contains("\\n");
+
+    sentence_markers >= 3 && (substantial_lines >= 4 || markdown_signals)
+}
+
 fn adaptive_truncation_limit(text: &str) -> usize {
     let line_count = text.lines().count();
     let avg_line_length = text.len() / line_count.max(1);
@@ -507,25 +583,19 @@ fn adaptive_truncation_limit(text: &str) -> usize {
 }
 
 fn filter_by_token_budget(text: &str, max_tokens: usize) -> String {
-    let limited = if text.len() > DEFAULT_MAX_STRING_CHARS {
-        &text[..safe_truncation_boundary(text, DEFAULT_MAX_STRING_CHARS)]
-    } else {
-        text
-    };
-
-    let estimated = estimate_tokens(limited);
+    let estimated = estimate_tokens(text);
 
     if estimated <= max_tokens {
-        return limited.to_string();
+        return text.to_string();
     }
 
     let mut low = 0;
-    let mut high = limited.len();
+    let mut high = text.len();
 
     while low < high {
         let mid = (low + high) / 2;
-        let adj_mid = safe_truncation_boundary(limited, mid);
-        let chunk = &limited[..adj_mid];
+        let adj_mid = safe_truncation_boundary(text, mid);
+        let chunk = &text[..adj_mid];
 
         if estimate_tokens(chunk) <= max_tokens {
             if low == adj_mid {
@@ -539,7 +609,7 @@ fn filter_by_token_budget(text: &str, max_tokens: usize) -> String {
 
     format!(
         "{}\n[... truncated to {} tokens by clov]",
-        &limited[..low],
+        &text[..low],
         max_tokens
     )
 }
@@ -574,6 +644,43 @@ fn looks_like_html(text: &str) -> bool {
         || lowered.contains("</")
 }
 
+fn looks_like_markdown_table_row(line: &str) -> bool {
+    let pipe_count = line.matches('|').count();
+    pipe_count >= 2 && (line.starts_with('|') || line.ends_with('|'))
+}
+
+fn is_markdown_table_separator(line: &str) -> bool {
+    if !looks_like_markdown_table_row(line) {
+        return false;
+    }
+
+    let cells: Vec<&str> = line
+        .split('|')
+        .map(str::trim)
+        .filter(|cell| !cell.is_empty())
+        .collect();
+
+    !cells.is_empty()
+        && cells
+            .iter()
+            .all(|cell| !cell.is_empty() && cell.chars().all(|ch| matches!(ch, '-' | ':' | ' ')))
+}
+
+fn normalize_markdown_table_row(line: &str) -> String {
+    let cells: Vec<&str> = line
+        .split('|')
+        .map(str::trim)
+        .filter(|cell| !cell.is_empty())
+        .collect();
+
+    match cells.as_slice() {
+        [] => String::new(),
+        [single] => (*single).to_string(),
+        [left, right] => format!("{}: {}", left, right),
+        _ => cells.join(" — "),
+    }
+}
+
 fn search_like_keys() -> &'static [&'static str] {
     &["results", "items", "documents", "matches"]
 }
@@ -605,6 +712,12 @@ fn text_like_keys() -> &'static [&'static str] {
     &[
         "text", "content", "summary", "snippet", "body", "html", "source",
     ]
+}
+
+lazy_static! {
+    static ref MULTIPLE_BLANKS: Regex = Regex::new(r"\n{4,}").unwrap();
+    static ref MULTIPLE_SPACES: Regex = Regex::new(r"[ \t]{3,}").unwrap();
+    static ref ARTICLE_HEADING: Regex = Regex::new(r"^#{1,6}\s+").unwrap();
 }
 
 #[cfg(test)]
@@ -674,5 +787,31 @@ mod tests {
         assert!(result.contains_key("url"));
         assert!(result.contains_key("text"));
         assert!(!result.contains_key("extra"));
+    }
+
+    #[test]
+    fn cleans_article_readability_artifacts() {
+        let input = concat!(
+            "## Overview\\n",
+            "This article explains the fix in plain language for readers.\\n",
+            "It preserves useful context while removing noisy formatting.\\n\\n",
+            "| Signal | Meaning |\\n",
+            "| --- | --- |\\n",
+            "| latency | low |\\n",
+            "| noise | reduced |\\n\\n",
+            "The crawler also emitted markdown hard breaks for layout.\\n",
+            "That should read like normal prose instead.\\\\\n",
+            "Another useful sentence closes the example."
+        );
+
+        let output = filter_response(input, &FilterContext::default());
+
+        assert!(output.contains("Overview"));
+        assert!(output.contains("latency: low"));
+        assert!(output.contains("noise: reduced"));
+        assert!(!output.contains("##"));
+        assert!(!output.contains("| --- |"));
+        assert!(!output.contains("\\n"));
+        assert!(!output.contains("\\\\\n"));
     }
 }
