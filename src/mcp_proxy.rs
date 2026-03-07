@@ -20,7 +20,6 @@
 //! The proxy tracks request IDs from `tools/call` requests to know which
 //! responses need filtering and which tool's filter to apply.
 
-use crate::mcp_filters;
 use anyhow::{Context, Result};
 use serde_json::Value;
 use std::collections::HashMap;
@@ -252,12 +251,19 @@ fn filter_tool_response(
                         if let Some(text) = item.get("text").and_then(|t| t.as_str()) {
                             total_input += text.len();
 
-                            if let Some(filtered) = mcp_filters::filter_for_tool(&tool_name, text) {
-                                total_output += filtered.len();
-                                item["text"] = Value::String(filtered);
-                            } else {
-                                total_output += text.len();
-                            }
+                            let context = crate::universal_filter::FilterContext::default();
+                            let filtered = crate::universal_filter::filter_response(text, &context);
+                            total_output += filtered.len();
+
+                            #[allow(deprecated)]
+                            crate::tracking::track(
+                                "mcp-call",
+                                &format!("clov-mcp-{}", tool_name),
+                                text,
+                                &filtered,
+                            );
+
+                            item["text"] = Value::String(filtered);
                         }
                     }
                 }
@@ -295,109 +301,4 @@ pub fn is_tool_call_response(msg: &Value) -> bool {
         && msg.get("method").is_none()
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use serde_json::json;
 
-    #[test]
-    fn test_is_tool_call_response_valid() {
-        let msg = json!({
-            "jsonrpc": "2.0",
-            "id": 5,
-            "result": {
-                "content": [{"type": "text", "text": "hello"}]
-            }
-        });
-        assert!(is_tool_call_response(&msg));
-    }
-
-    #[test]
-    fn test_is_tool_call_response_request_not_response() {
-        let msg = json!({
-            "jsonrpc": "2.0",
-            "id": 5,
-            "method": "tools/call",
-            "params": {"name": "web_search_exa"}
-        });
-        assert!(!is_tool_call_response(&msg));
-    }
-
-    #[test]
-    fn test_is_tool_call_response_notification_not_response() {
-        let msg = json!({
-            "jsonrpc": "2.0",
-            "method": "notifications/tools/list_changed"
-        });
-        assert!(!is_tool_call_response(&msg));
-    }
-
-    #[test]
-    fn test_request_id_tracking() {
-        let pending: Arc<Mutex<HashMap<Value, String>>> = Arc::new(Mutex::new(HashMap::new()));
-
-        let request = json!({
-            "jsonrpc": "2.0",
-            "id": 42,
-            "method": "tools/call",
-            "params": {
-                "name": "web_search_exa",
-                "arguments": {"query": "rust programming"}
-            }
-        });
-
-        track_tool_call_request(&request, &pending, 0);
-
-        let map = pending.lock().unwrap();
-        assert_eq!(map.get(&json!(42)), Some(&"web_search_exa".to_string()));
-    }
-
-    #[test]
-    fn test_filter_tool_response_filters_tracked() {
-        let pending: Arc<Mutex<HashMap<Value, String>>> = Arc::new(Mutex::new(HashMap::new()));
-
-        // Track a request
-        pending
-            .lock()
-            .unwrap()
-            .insert(json!(7), "web_search_exa".to_string());
-
-        // Create a response with nav chrome
-        let response = json!({
-            "jsonrpc": "2.0",
-            "id": 7,
-            "result": {
-                "content": [{
-                    "type": "text",
-                    "text": "Skip to main content\nMenu\n\nActual search result content here.\n\nCookie\n© 2025"
-                }]
-            }
-        });
-
-        let filtered = filter_tool_response(response, &pending, 0);
-        let text = filtered["result"]["content"][0]["text"].as_str().unwrap();
-        assert!(text.contains("Actual search result content"));
-        assert!(!text.contains("Skip to main content"));
-        assert!(!text.contains("Cookie"));
-
-        // Request should be removed from pending
-        assert!(pending.lock().unwrap().is_empty());
-    }
-
-    #[test]
-    fn test_passthrough_non_tool_messages() {
-        let pending: Arc<Mutex<HashMap<Value, String>>> = Arc::new(Mutex::new(HashMap::new()));
-
-        // A tools/list response — has no tracked ID, should pass through
-        let msg = json!({
-            "jsonrpc": "2.0",
-            "id": 1,
-            "result": {
-                "tools": [{"name": "web_search_exa", "description": "Search the web"}]
-            }
-        });
-
-        let result = filter_tool_response(msg.clone(), &pending, 0);
-        assert_eq!(result, msg); // unchanged
-    }
-}

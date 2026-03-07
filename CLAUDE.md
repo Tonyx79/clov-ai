@@ -4,11 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**clov (Clov Token Omitter)** v0.27.2 is a high-performance CLI proxy that minimizes LLM token consumption by filtering and compressing command outputs. It achieves 60-90% token savings on common development operations through smart filtering, grouping, truncation, and deduplication.
+**clov (Clov Token Omitter)** v0.27.7 is a high-performance CLI proxy that minimizes LLM token consumption by filtering and compressing command outputs. It achieves 60-90% token savings on common development operations through smart filtering, grouping, truncation, and deduplication.
 
 This is a fork with critical fixes for git argument parsing and modern JavaScript stack support (pnpm, vitest, Next.js, TypeScript, Playwright, Prisma).
 
-**NEW (v0.26.4)**: MCP Proxy Support. Integrated JSON-RPC stdio proxy for filtering bloated MCP tool responses (Exa, etc.) with 85-95% token savings.
+**NEW (v0.26.4)**: Universal MCP Proxy. Integrated JSON-RPC stdio proxy for filtering bloated MCP tool responses with 85-95% token savings.
 
 ## Development Commands
 
@@ -160,7 +160,7 @@ main.rs:Commands enum
 
 ### MCP Proxy Mode
 
-**Purpose**: Filter and optimize MCP tool responses (specifically Exa) before they reach the LLM context.
+**Purpose**: Filter and optimize MCP tool responses before they reach the LLM context.
 
 **Usage**: Router your MCP server via clov in `settings.json`:
 `clov mcp proxy <real-mcp-command> [args...]`
@@ -169,7 +169,7 @@ main.rs:Commands enum
 
 - **JSON-Aware**: Parses internal result text to strip web chrome without breaking JSON structure.
 - **Request ID Tracking**: Correctly associates asynchronous tool responses with their original requests.
-- **Exa Optimized**: Specialized filters for `web_search_exa`, `crawling_exa`, and `get_code_context_exa`.
+- **Universal Filters**: Structure-based detection for Search, Code, and Text formats without hardcoding tool names.
 
 **Savings**: 85-95% reduction on web-heavy tool results.
 
@@ -196,35 +196,35 @@ main.rs:Commands enum
 
 ### Module Responsibilities
 
-| Module            | Purpose                      | Token Strategy                                                 |
-| ----------------- | ---------------------------- | -------------------------------------------------------------- |
-| git.rs            | Git operations               | Stat summaries + compact diffs                                 |
-| grep_cmd.rs       | Code search                  | Group by file, truncate lines                                  |
-| ls.rs             | Directory listing            | Tree format, aggregate counts                                  |
-| read.rs           | File reading                 | Filter-level based stripping                                   |
-| runner.rs         | Command execution            | Stderr only (err), failures only (test)                        |
-| log_cmd.rs        | Log parsing                  | Deduplication with counts                                      |
-| json_cmd.rs       | JSON inspection              | Structure without values                                       |
-| lint_cmd.rs       | ESLint/Biome linting         | Group by rule, file summary (84% reduction)                    |
-| tsc_cmd.rs        | TypeScript compiler          | Group by file/error code (83% reduction)                       |
-| next_cmd.rs       | Next.js build/dev            | Route metrics, bundle stats only (87% reduction)               |
-| prettier_cmd.rs   | Format checking              | Files needing changes only (70% reduction)                     |
-| playwright_cmd.rs | E2E test results             | Failures only, grouped by suite (94% reduction)                |
-| prisma_cmd.rs     | Prisma CLI                   | Strip ASCII art and verbose output (88% reduction)             |
-| gh_cmd.rs         | GitHub CLI                   | Compact PR/issue/run views (26-87% reduction)                  |
-| vitest_cmd.rs     | Vitest test runner           | Failures only with ANSI stripping (99.5% reduction)            |
-| pnpm_cmd.rs       | pnpm package manager         | Compact dependency trees (70-90% reduction)                    |
-| ruff_cmd.rs       | Ruff linter/formatter        | JSON for check, text for format (80%+ reduction)               |
-| pytest_cmd.rs     | Pytest test runner           | State machine text parser (90%+ reduction)                     |
-| mypy_cmd.rs       | Mypy type checker            | Group by file/error code (80% reduction)                       |
-| pip_cmd.rs        | pip/uv package manager       | JSON parsing, auto-detect uv (70-85% reduction)                |
-| go_cmd.rs         | Go commands                  | NDJSON for test, text for build/vet (80-90% reduction)         |
-| golangci_cmd.rs   | golangci-lint                | JSON parsing, group by rule (85% reduction)                    |
-| tee.rs            | Full output recovery         | Save raw output to file on failure, print hint for LLM re-read |
-| utils.rs          | Shared utilities             | Package manager detection, common formatting                   |
-| mcp_proxy.rs      | MCP Tool Proxy               | JSON-RPC stdio proxy with request ID tracking                  |
-| mcp_filters.rs    | MCP Response Filters         | Exa-specific web chrome stripping (85-95% reduction)           |
-| discover/         | Claude Code history analysis | Scan JSONL sessions, classify commands, report missed savings  |
+| Module              | Purpose                      | Token Strategy                                                 |
+| ------------------- | ---------------------------- | -------------------------------------------------------------- |
+| git.rs              | Git operations               | Stat summaries + compact diffs                                 |
+| grep_cmd.rs         | Code search                  | Group by file, truncate lines                                  |
+| ls.rs               | Directory listing            | Tree format, aggregate counts                                  |
+| read.rs             | File reading                 | Filter-level based stripping                                   |
+| runner.rs           | Command execution            | Stderr only (err), failures only (test)                        |
+| log_cmd.rs          | Log parsing                  | Deduplication with counts                                      |
+| json_cmd.rs         | JSON inspection              | Structure without values                                       |
+| lint_cmd.rs         | ESLint/Biome linting         | Group by rule, file summary (84% reduction)                    |
+| tsc_cmd.rs          | TypeScript compiler          | Group by file/error code (83% reduction)                       |
+| next_cmd.rs         | Next.js build/dev            | Route metrics, bundle stats only (87% reduction)               |
+| prettier_cmd.rs     | Format checking              | Files needing changes only (70% reduction)                     |
+| playwright_cmd.rs   | E2E test results             | Failures only, grouped by suite (94% reduction)                |
+| prisma_cmd.rs       | Prisma CLI                   | Strip ASCII art and verbose output (88% reduction)             |
+| gh_cmd.rs           | GitHub CLI                   | Compact PR/issue/run views (26-87% reduction)                  |
+| vitest_cmd.rs       | Vitest test runner           | Failures only with ANSI stripping (99.5% reduction)            |
+| pnpm_cmd.rs         | pnpm package manager         | Compact dependency trees (70-90% reduction)                    |
+| ruff_cmd.rs         | Ruff linter/formatter        | JSON for check, text for format (80%+ reduction)               |
+| pytest_cmd.rs       | Pytest test runner           | State machine text parser (90%+ reduction)                     |
+| mypy_cmd.rs         | Mypy type checker            | Group by file/error code (80% reduction)                       |
+| pip_cmd.rs          | pip/uv package manager       | JSON parsing, auto-detect uv (70-85% reduction)                |
+| go_cmd.rs           | Go commands                  | NDJSON for test, text for build/vet (80-90% reduction)         |
+| golangci_cmd.rs     | golangci-lint                | JSON parsing, group by rule (85% reduction)                    |
+| tee.rs              | Full output recovery         | Save raw output to file on failure, print hint for LLM re-read |
+| utils.rs            | Shared utilities             | Package manager detection, common formatting                   |
+| mcp_proxy.rs        | MCP Tool Proxy               | JSON-RPC stdio proxy with request ID tracking                  |
+| universal_filter.rs | MCP Response Filters         | Universal structure-based chrome stripping (85-95% reduction)  |
+| discover/           | Claude Code history analysis | Scan JSONL sessions, classify commands, report missed savings  |
 
 ## Performance Constraints
 

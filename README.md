@@ -5,7 +5,7 @@
 </p>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-0.27.2-blue.svg)](https://github.com/alexandephilia/clov-ai/releases/tag/v0.27.2)
+[![Version](https://img.shields.io/badge/version-0.27.7-blue.svg)](https://github.com/alexandephilia/clov-ai/releases/tag/v0.27.7)
 [![Built with Rust](https://img.shields.io/badge/built_with-Rust-orange?logo=rust&logoColor=white)](https://www.rust-lang.org/)
 [![Python](https://img.shields.io/badge/Python-supported-3776AB?logo=python&logoColor=white)](#python--go)
 [![Go](https://img.shields.io/badge/Go-supported-00ADD8?logo=go&logoColor=white)](#python--go)
@@ -219,11 +219,11 @@ Filter bloated MCP tool responses before they reach your LLM context. 85-95% tok
 clov mcp proxy <mcp-command>     # JSON-aware proxy with request ID tracking
 ```
 
-**Exa Optimized**:
+**Universal Filtering**:
 
-- Specialized filters for `web_search_exa`, `crawling_exa`, and `get_code_context_exa`
-- Strips navigation, footers, and tracking params while preserving 100% signal
-- Parses internal JSON text results to avoid breaking protocol structure
+- Content structure detection automatically identifies Web Search, Code, Structured Data, or Text
+- Universally strips navigation, footers, and tracking params across _all_ MCP search tools (Exa, Brave, etc.)
+- Parses internal JSON text results and scales truncation limits adaptively by density
 
 **Setup**:
 Update your `~/.claude/settings.json` to route MCP servers through clov:

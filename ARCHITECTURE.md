@@ -121,7 +121,7 @@ Claude Code (Client) clov (Proxy) MCP Server (Child)
 │ tools/call (id: 123) │ │
 │ ──────────────────────────►│ Forward to server │
 │ │ ───────────────────────►│
-│ │ Track: 123 -> Exa │ Execution
+│ │ Track: 123 -> tool_name │ Execution
 │ │ │ ───────────┐
 │ │ │ │
 │ │ Response (id: 123) │ │
@@ -589,7 +589,7 @@ go_cmd.rs         SUB-ENUM ROUTER       Mixed formats     75-90%
     │ {results:[]} │      Preserve structure     Limit content
     └──────────────┘
 
-    Used by: mcp_filters (Exa web search, crawling)
+    Used by: universal_filter (All MCP tools: web search, crawling, text, code)
   go build: TEXT FILTERING
     Errors only (compiler diagnostics)
     → Strip warnings, show errors with file:line

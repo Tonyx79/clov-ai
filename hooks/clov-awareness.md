@@ -63,7 +63,7 @@ clov proxy git log --oneline -20   # Bypass filtering, still track metrics
 
 ### 4. MCP Tools → Route via `clov mcp proxy`
 
-For MCP servers like Exa, route the entire server through CLOV in your Claude Code `settings.json`.
+For MCP servers like Exa or Brave, route the entire server through CLOV in your Claude Code `settings.json`.
 
 ```json
 {
@@ -77,9 +77,11 @@ For MCP servers like Exa, route the entire server through CLOV in your Claude Co
 }
 ```
 
-**Supported MCP Filters**:
+**Universal MCP Filters**:
 
-- `exa` (web_search, crawling) → Strips nav chrome, cookie notices, footers. 85-95% savings.
+- Structure-aware detection for Web Search, Code, and Text formats.
+- Automatically strips nav chrome, cookie notices, and footers across _all_ providers.
+- 85-95% token savings on web-heavy results.
 
 ## Hook Mechanism
 
