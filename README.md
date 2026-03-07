@@ -22,7 +22,7 @@ Deploy `clov` between your AI agent and the world. Reclaim up to **95%** of your
 
 ## The Economics of Context
 
-![clov savings](clov_2.jpg)
+![clov savings](clov_4.jpg)
 
 When an AI coder hits an MCP search tool, a single raw response easily spikes over 50,000 tokens. `clov` intercepts, analyzes the structure, and prunes it intelligently.
 
