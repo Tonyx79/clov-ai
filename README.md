@@ -785,7 +785,7 @@ If something is broken, open an issue and say so clearly. If you built a filter,
 
 ---
 
-Hard fork of the original clov. Built in Rust. Cuts the garbage so your model gets the signal.
+This project is a hard fork. Built in Rust. Cuts the garbage so your model gets the signal.
 
 Maintained by [@alexandephilia](https://github.com/alexandephilia) and Claude.
 PRs open. Bug reports mandatory. Whining without a repro gets closed.
