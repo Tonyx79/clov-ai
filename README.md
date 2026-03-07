@@ -623,31 +623,31 @@ The hook lives at `.claude/hooks/clov-rewrite.sh` in this repository. To use it 
 
 ### Commands Rewritten
 
-| Raw Command                                                   | Rewritten To             |
-| ------------------------------------------------------------- | ------------------------ |
-| `git status/diff/log/add/commit/push/pull/branch/fetch/stash` | `clov git ...`           |
-| `gh pr/issue/run`                                             | `clov gh ...`            |
-| `cargo test/build/clippy`                                     | `clov cargo ...`         |
-| `cat <file>`                                                  | `clov read <file>`       |
-| `rg/grep <pattern>`                                           | `clov grep <pattern>`    |
-| `ls`                                                          | `clov ls`                |
-| `vitest/pnpm test`                                            | `clov vitest run`        |
-| `tsc/pnpm tsc`                                                | `clov tsc`               |
-| `eslint/pnpm lint`                                            | `clov lint`              |
-| `prettier`                                                    | `clov prettier`          |
-| `playwright`                                                  | `clov playwright`        |
-| `prisma`                                                      | `clov prisma`            |
-| `ruff check/format`                                           | `clov ruff ...`          |
-| `pytest`                                                      | `clov pytest`            |
-| `pip list/install/outdated`                                   | `clov pip ...`           |
-| `go test/build/vet`                                           | `clov go ...`            |
-| `golangci-lint run`                                           | `clov golangci-lint run` |
-| `docker ps/images/logs`                                       | `clov docker ...`        |
-| `kubectl get/logs`                                            | `clov kubectl ...`       |
-| `curl`                                                        | `clov curl`              |
-| `pnpm list/ls/outdated`                                       | `clov pnpm ...`          |
+```
+git         -> clov git ...
+gh          -> clov gh ...
+cargo       -> clov cargo ...
+cat         -> clov read ...
+rg / grep   -> clov grep ...
+ls          -> clov ls
+vitest      -> clov vitest run
+tsc         -> clov tsc
+eslint      -> clov lint
+prettier    -> clov prettier
+playwright  -> clov playwright
+prisma      -> clov prisma
+ruff        -> clov ruff ...
+pytest      -> clov pytest
+pip         -> clov pip ...
+go          -> clov go ...
+golangci-lint -> clov golangci-lint run
+docker      -> clov docker ...
+kubectl     -> clov kubectl ...
+curl        -> clov curl
+pnpm        -> clov pnpm ...
+```
 
-Commands already using `clov`, heredocs (`<<`), and unrecognized commands pass through unchanged.
+Commands already using `clov`, heredocs, and anything unrecognized pass through unchanged.
 
 ### Suggest Hook (Non-Intrusive Alternative)
 
