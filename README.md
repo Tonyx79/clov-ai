@@ -1,5 +1,7 @@
 # CLOV - Context Limiter & Output Vetter
 
+_Documentation structure inspired by [rtk-ai/rtk](https://github.com/rtk-ai/rtk/)._
+
 <p align="center">
   <img src="assets/clov.png" width="400" alt="clov mascot">
 </p>
@@ -189,4 +191,6 @@ MIT License — see [LICENSE](LICENSE).
   <img src="https://skillicons.dev/icons?i=rust,python,go" height="24" />
   <br/><br/>
   <sub>Authored by <a href="https://github.com/alexandephilia">@alexandephilia</a> × claude</sub>
+  <br/>
+  <sub>README attribution: inspired by <a href="https://github.com/rtk-ai/rtk/">rtk-ai/rtk</a></sub>
 </p>
