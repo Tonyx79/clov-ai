@@ -788,6 +788,37 @@ mod tests {
         );
     }
 
+    // --- gt rewrite tests ---
+
+    #[test]
+    fn test_rewrite_gt_log() {
+        assert_eq!(rewrite_command("gt log"), Some("clov gt log".into()));
+    }
+
+    #[test]
+    fn test_rewrite_gt_submit() {
+        assert_eq!(rewrite_command("gt submit"), Some("clov gt submit".into()));
+    }
+
+    #[test]
+    fn test_rewrite_gt_sync() {
+        assert_eq!(rewrite_command("gt sync"), Some("clov gt sync".into()));
+    }
+
+    #[test]
+    fn test_rewrite_gt_restack() {
+        assert_eq!(rewrite_command("gt restack"), Some("clov gt restack".into()));
+    }
+
+    #[test]
+    fn test_classify_gt_log() {
+        let result = classify_command("gt log");
+        assert!(
+            matches!(result, Classification::Supported { clov_equivalent, .. } if clov_equivalent == "clov gt"),
+            "gt log should classify as Supported(clov gt), got {:?}", result
+        );
+    }
+
     // --- rewrite_command tests ---
 
     #[test]

@@ -44,6 +44,8 @@ pub const PATTERNS: &[&str] = &[
     // Go tooling
     r"^go\s+(test|build|vet)",
     r"^golangci-lint(\s|$)",
+    // Graphite
+    r"^gt\s+(log|submit|sync|restack|create|branch|status|diff|show|add|push|pull|fetch|stash|worktree)",
     // AWS CLI
     r"^aws\s+",
     // PostgreSQL
@@ -297,6 +299,21 @@ pub const RULES: &[ClovRule] = &[
         category: "Go",
         savings_pct: 85.0,
         subcmd_savings: &[],
+        subcmd_status: &[],
+    },
+    // Graphite stacked PRs
+    ClovRule {
+        clov_cmd: "clov gt",
+        rewrite_prefixes: &["gt"],
+        category: "Git",
+        savings_pct: 80.0,
+        subcmd_savings: &[
+            ("log", 75.0),
+            ("submit", 90.0),
+            ("sync", 85.0),
+            ("restack", 85.0),
+            ("create", 80.0),
+        ],
         subcmd_status: &[],
     },
     // AWS CLI

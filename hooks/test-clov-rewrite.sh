@@ -263,7 +263,43 @@ test_rewrite "pnpm vitest run --coverage" \
 
 echo ""
 
-# ---- SECTION 5: Should NOT rewrite ----
+# ---- SECTION 5: Graphite (gt) ----
+echo "--- Graphite (gt) ---"
+test_rewrite "gt log" \
+  "gt log" \
+  "clov gt log"
+
+test_rewrite "gt log short" \
+  "gt log short" \
+  "clov gt log short"
+
+test_rewrite "gt submit" \
+  "gt submit" \
+  "clov gt submit"
+
+test_rewrite "gt sync" \
+  "gt sync" \
+  "clov gt sync"
+
+test_rewrite "gt restack" \
+  "gt restack" \
+  "clov gt restack"
+
+test_rewrite "gt create" \
+  "gt create" \
+  "clov gt create"
+
+test_rewrite "gt branch" \
+  "gt branch" \
+  "clov gt branch"
+
+test_rewrite "gt status (routes to git filter)" \
+  "gt status" \
+  "clov gt status"
+
+echo ""
+
+# ---- SECTION 7: Should NOT rewrite ----
 echo "--- Should NOT rewrite ---"
 test_rewrite "already clov" \
   "clov git status" \
