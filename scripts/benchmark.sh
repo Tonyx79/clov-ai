@@ -166,7 +166,7 @@ section "git"
 bench "git status" "git status" "$CLOV git status"
 bench "git log -n 10" "git log -10" "$CLOV git log -n 10"
 bench "git log -n 5" "git log -5" "$CLOV git log -n 5"
-bench "git diff" "git diff HEAD~1 2>/dev/null || echo ''" "$CLOV git diff"
+bench "git diff" "git diff HEAD~1 2>/dev/null || echo ''" "$CLOV git diff HEAD~1"
 
 # ===================
 # grep
