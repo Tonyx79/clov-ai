@@ -1,4 +1,4 @@
-# clov — Token Omitter for LLM Workflows
+# clov: Token Omitter for LLM Workflows
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Version](https://img.shields.io/badge/version-0.25.0-blue.svg)](https://github.com/alexandephilia/clov-ai/releases/tag/v0.25.0)
@@ -11,11 +11,13 @@
 
 ![clov preview](img_1.jpg)
 
-clov sits between your shell and your model. It intercepts command output, strips the noise, and returns only what matters — commit hashes, test failures, build errors. Not the 200 lines of progress bars and timestamps nobody asked for. Token reduction hits 60–90% on most dev operations, and you will notice it immediately.
+clov sits between your shell and your model. It intercepts command output, strips the noise, and returns only what matters: commit hashes, test failures, build errors. Not the 200 lines of progress bars and timestamps nobody asked for. The difference shows up fast.
 
 ## Token Savings (30-min Claude Code Session, Yes It's Real)
 
 ![clov preview 2](img_2.jpg)
+
+Raw shell output is a token dumpster fire. Here's what a typical session looks like with and without clov:
 
 Typical session without clov: **~150,000 tokens**
 With clov: **~45,000 tokens** -> **70% reduction**
@@ -42,7 +44,7 @@ With clov: **~45,000 tokens** -> **70% reduction**
 
 ### Pre-Installation Check (Do This First, Damn It)
 
-Don't skip this and then waste an hour reinstalling something that was already there. Check if clov is already on your system first:
+Don't waste an hour reinstalling something that is already there. Check if clov is on your system before doing anything:
 
 ```bash
 clov --version        # Check if this damn thing is installed
@@ -192,11 +194,11 @@ clov gain --all --format csv     # CSV for Excel/analysis
 
 ### Discover: See What You've Been Wasting
 
-Scans your Claude Code session history and shows exactly where you left tokens on the table. Useful if you want to know how bad the damage actually is:
+Scans your Claude Code session history and shows exactly where you pissed tokens away. Useful when you want to know how bad the damage actually is before you pretend you were being efficient:
 
-- Seeing how many damn tokens got wasted while clov wasn't running
-- Finding which commands you keep running raw when you shouldn't be
-- Spotting unhandled commands worth turning into clov features or opening an issue for
+- Which commands ran raw when clov could have handled them
+- How many tokens that stupidity cost you
+- Unhandled commands worth filing an issue for
 
 ```bash
 clov discover                    # Current project, last 30 days
@@ -344,7 +346,7 @@ with clov
                ~200 tokens
 ```
 
-Four reduction strategies, because raw output is genuinely useless noise most of the time:
+Four strategies that handle the bulk of the crap your shell spews at the model:
 
 1. **Smart Filtering**: strips comments, blank lines, ANSI codes, and all the boilerplate nobody asked for
 2. **Grouping**: aggregates related items, errors by type, files by directory
@@ -354,6 +356,8 @@ Four reduction strategies, because raw output is genuinely useless noise most of
 ## Configuration
 
 ### Installation Modes (Pick One and Stop Second-Guessing)
+
+Four modes. Pick the one that fits and stop overthinking it:
 
 | Command                    | Scope  | Hook | CLOV.md       | CLAUDE.md        | Tokens in Context | Use Case                                 |
 | -------------------------- | ------ | ---- | ------------- | ---------------- | ----------------- | ---------------------------------------- |
@@ -434,7 +438,7 @@ cp ~/.claude/settings.json.bak ~/.claude/settings.json  # Restore the damn backu
 
 ### Custom Database Path (If the Default Pisses You Off)
 
-By default, clov stores tracking data in `~/.local/share/clov/history.db`. If that location doesn't work for you, override it:
+By default, clov stores tracking data in `~/.local/share/clov/history.db`. If that location doesn't work for your setup, override it and move on:
 
 **Environment variable (highest priority):**
 
@@ -453,7 +457,7 @@ Priority: `CLOV_DB_PATH` env var > `config.toml` > default location.
 
 ### Tee: Full Output Recovery (Stops the Re-Run Hell)
 
-When clov filters a command, the LLM loses the raw failure details and ends up re-running the same damn command two or three times trying to figure out what went wrong. The tee feature saves the unfiltered output to a file so the agent reads it directly instead of wasting more tokens on a re-run.
+When clov filters a command, raw failure details disappear and the LLM re-runs the same damn command three times trying to figure out what broke. The tee feature saves unfiltered output to a file so the agent reads it directly instead of wasting more tokens on a retry loop.
 
 On failure, clov writes full output to `~/.local/share/clov/tee/` and prints a one-line hint:
 
@@ -486,17 +490,17 @@ max_file_size = 1048576 # 1MB per file max
 
 ## Auto-Rewrite Hook (Use This Damn Thing)
 
-The best way to use clov is the auto-rewrite hook for Claude Code. CLAUDE.md instructions get ignored by subagents all the damn time. The hook does not get ignored. It intercepts Bash commands and rewrites them before the shell ever sees them.
+CLAUDE.md instructions get ignored by subagents constantly. The hook does not get ignored. It intercepts Bash commands and rewrites them before the shell ever sees them, giving you full clov coverage with zero effort after setup.
 
 **Result**: 100% clov coverage across all conversations and subagents, zero token overhead in Claude's context.
 
 ### What Are Hooks?
 
-Claude Code hooks are scripts that run before or after Claude executes a command. clov registers a **PreToolUse** hook that intercepts Bash commands and rewrites them silently, e.g. `git status` becomes `clov git status` before execution. Claude only sees the filtered output, never the raw garbage.
+Claude Code hooks are scripts that run before or after Claude executes a command. clov registers a **PreToolUse** hook that intercepts Bash commands and rewrites them silently. `git status` becomes `clov git status` before execution. Claude only sees filtered output and never touches the raw garbage.
 
-**Why settings.json?** Claude Code reads `~/.claude/settings.json` to find registered hooks. Without that entry, it does not know the hook exists and you get nothing.
+**Why settings.json?** Claude Code reads `~/.claude/settings.json` to find registered hooks. Without that entry, the hook does not exist as far as Claude is concerned.
 
-**Is it safe?** Yes. clov creates a backup before touching anything. The hook only modifies command strings. It does not delete files or access secrets. If you don't trust it, read the damn hook yourself at `~/.claude/hooks/clov-rewrite.sh`.
+**Is it safe?** Yes. clov creates a backup before touching anything. The hook only modifies command strings and does not touch files or secrets. If you still don't trust it, read the damn hook at `~/.claude/hooks/clov-rewrite.sh`.
 
 ### How It Works
 
@@ -634,7 +638,7 @@ Commands already using `clov`, heredocs, and anything unrecognized pass through 
 
 ### Suggest Hook (If You Like Watching Paint Dry)
 
-If you would rather have Claude Code suggest clov than silently rewrite commands, use the suggest hook instead. It prints a reminder when clov-compatible commands are detected and leaves the command alone. Useful for auditing, though if you actually want savings just use the rewrite hook and stop overthinking it.
+Prefer Claude Code to suggest clov rather than silently rewrite commands? Use the suggest hook. It prints a reminder when clov-compatible commands are detected and leaves the original command alone. Good for auditing or if you hate automation but still want the hint.
 
 **Comparison:**
 
@@ -684,7 +688,7 @@ The suggest hook detects the same commands as the rewrite hook but outputs a `sy
 
 ## Uninstalling clov (Fine, Your Loss)
 
-If you want out, fine. Here's how to do it cleanly:
+Want out? Here is how to do it cleanly without leaving junk all over your system:
 
 **Complete removal (global):**
 
@@ -729,7 +733,7 @@ sudo dnf remove clov         # Fedora/RHEL
 
 ## Troubleshooting (Fix Your Damn Setup)
 
-Most of these come down to bad JSON, a missing PATH, or forgetting to restart. Fix the obvious thing first before assuming clov is broken.
+Most problems come down to bad JSON, a missing PATH, or forgetting to restart Claude Code. Check the obvious thing before assuming clov is broken.
 
 ### settings.json Patching Failed
 
