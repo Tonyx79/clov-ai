@@ -3,17 +3,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Version](https://img.shields.io/badge/version-0.25.0-blue.svg)](https://github.com/alexandephilia/clov-ai/releases/tag/v0.25.0)
 [![Built with Rust](https://img.shields.io/badge/built_with-Rust-orange?logo=rust&logoColor=white)](https://www.rust-lang.org/)
-[![CI](https://github.com/alexandephilia/clov-ai/actions/workflows/release.yml/badge.svg)](https://github.com/alexandephilia/clov-ai/actions/workflows/release.yml)
-<br>
-[![macOS](https://img.shields.io/badge/macOS-supported-black?logo=apple&logoColor=white)](https://github.com/alexandephilia/clov-ai/releases)
-[![Linux](https://img.shields.io/badge/Linux-supported-FCC624?logo=linux&logoColor=black)](https://github.com/alexandephilia/clov-ai/releases)
-[![Windows](https://img.shields.io/badge/Windows-supported-0078D4?logo=windows&logoColor=white)](https://github.com/alexandephilia/clov-ai/releases)
-<br>
-[![TypeScript](https://img.shields.io/badge/TypeScript-supported-3178C6?logo=typescript&logoColor=white)](#javascript-and-typescript-stack)
-[![Next.js](https://img.shields.io/badge/Next.js-supported-black?logo=next.js&logoColor=white)](#javascript-and-typescript-stack)
 [![Python](https://img.shields.io/badge/Python-supported-3776AB?logo=python&logoColor=white)](#python-and-go-stack)
 [![Go](https://img.shields.io/badge/Go-supported-00ADD8?logo=go&logoColor=white)](#python-and-go-stack)
-[![Docker](https://img.shields.io/badge/Docker-supported-2496ED?logo=docker&logoColor=white)](#containers)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-integrated-7B2D8B?logo=anthropic&logoColor=white)](https://claude.ai/code)
 
 **Stop feeding your LLM a wall of shell garbage. clov filters it down to what actually matters.**
