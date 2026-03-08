@@ -1,7 +1,8 @@
-# CLOV ![Stars](https://img.shields.io/github/stars/alexandephilia/clov-ai)
+# CLOV ![Stars](https://img.shields.io/github/stars/alexandephilia/clov-ai) <img src="https://media.giphy.com/media/hvRJCLFzcasrR4ia7z/giphy.gif" width="30px"/>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-red.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/Version-0.35.0-green.svg)](https://github.com/alexandephilia/clov-ai/releases/tag/v0.35.0) [![Go](https://img.shields.io/badge/Go-%2300ADD8.svg?&logo=go&logoColor=white)](#)
+[![Version](https://img.shields.io/badge/Version-0.35.0-green.svg)](https://github.com/alexandephilia/clov-ai/releases/tag/v0.35.0)
+</br>[![Go](https://img.shields.io/badge/Go-%2300ADD8.svg?&logo=go&logoColor=white)](#) [![Python](https://img.shields.io/badge/Python-orange?logo=python&logoColor=fff)](#) [![Rust](https://img.shields.io/badge/Rust-%23000000.svg?e&logo=rust&logoColor=white)](#)
 
 ### 「Context Limiter & Output Vetter」
 
