@@ -178,6 +178,8 @@ clov pulse --graph     # 30-day visual velocity charting
 clov pulse --all       # Granular temporal exports
 ```
 
+![clov pulse proof](assets/clov_9.jpg)
+
 ---
 
 ## Deep Configuration
