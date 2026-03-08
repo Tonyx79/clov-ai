@@ -47,6 +47,7 @@ mod ruff_cmd;
 mod runner;
 mod summary;
 mod tee;
+mod tokenizer;
 mod tracking;
 mod tree;
 mod tsc_cmd;
@@ -635,6 +636,9 @@ enum McpAction {
         /// Maximum token budget per filtered MCP response
         #[arg(long)]
         max_tokens: Option<usize>,
+        /// Token counting profile for MCP budgeting and tracking
+        #[arg(long, value_enum)]
+        tokenizer_profile: Option<tokenizer::TokenizerProfile>,
         /// Maximum array items to retain before summarizing
         #[arg(long)]
         max_array_items: Option<usize>,
@@ -1815,6 +1819,7 @@ fn main() -> Result<()> {
         Commands::Mcp { action } => match action {
             McpAction::Proxy {
                 max_tokens,
+                tokenizer_profile,
                 max_array_items,
                 max_object_keys,
                 preserve_code,
@@ -1828,6 +1833,9 @@ fn main() -> Result<()> {
                     max_tokens: max_tokens
                         .or_else(|| read_env_usize("CLOV_MCP_MAX_TOKENS"))
                         .unwrap_or(default_context.max_tokens),
+                    tokenizer_profile: tokenizer_profile
+                        .or_else(|| tokenizer::profile_from_env("CLOV_MCP_TOKENIZER_PROFILE"))
+                        .unwrap_or(default_context.tokenizer_profile),
                     preserve_code: read_env_bool("CLOV_MCP_PRESERVE_CODE").unwrap_or(preserve_code),
                     aggressive_chrome_strip: read_env_bool("CLOV_MCP_AGGRESSIVE_CHROME_STRIP")
                         .unwrap_or(aggressive_chrome_strip),
@@ -2111,6 +2119,8 @@ mod tests {
             "proxy",
             "--max-tokens",
             "4096",
+            "--tokenizer-profile",
+            "generic-code",
             "--max-array-items",
             "4",
             "--max-object-keys",
@@ -2130,6 +2140,7 @@ mod tests {
                 action:
                     McpAction::Proxy {
                         max_tokens,
+                        tokenizer_profile,
                         max_array_items,
                         max_object_keys,
                         preserve_code,
@@ -2140,6 +2151,10 @@ mod tests {
                     },
             } => {
                 assert_eq!(max_tokens, Some(4096));
+                assert_eq!(
+                    tokenizer_profile,
+                    Some(tokenizer::TokenizerProfile::GenericCode)
+                );
                 assert_eq!(max_array_items, Some(4));
                 assert_eq!(max_object_keys, Some(6));
                 assert!(!preserve_code);

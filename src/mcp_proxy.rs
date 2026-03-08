@@ -124,7 +124,8 @@ fn proxy_server_to_client<R: BufRead, W: Write>(
     while let Some(mut message) = read_mcp_message(&mut reader)? {
         if !no_filter {
             if let Ok(msg) = serde_json::from_str::<Value>(&message.payload) {
-                let filtered = filter_tool_response(msg, pending_requests, verbose, &filter_context);
+                let filtered =
+                    filter_tool_response(msg, pending_requests, verbose, &filter_context);
                 message.payload = serde_json::to_string(&filtered).unwrap_or(message.payload);
             }
         }
@@ -321,12 +322,12 @@ fn filter_tool_response(
     }
 
     if total_input > 0 {
-        #[allow(deprecated)]
-        crate::tracking::track(
+        crate::tracking::track_with_profile(
             "mcp-call",
             &format!("clov-mcp-{}", tool_name),
             &tracking_input,
             &tracking_output,
+            Some(context.tokenizer_profile),
         );
     }
 
@@ -570,10 +571,13 @@ mod tests {
         let text = filtered["result"]["content"][0]["text"].as_str().unwrap();
 
         assert!(text.contains("Orchestrate teams of Claude Code sessions"));
-        assert!(text.contains("Coordinate multiple Claude Code instances working together as a team"));
+        assert!(
+            text.contains("Coordinate multiple Claude Code instances working together as a team")
+        );
         assert!(text.contains("Subagents: Agent teams"));
         assert!(text.contains("Context — Own context window — Fully independent"));
-        assert!(text.contains("This paragraph should survive the cleanup and stay readable at the end."));
+        assert!(text
+            .contains("This paragraph should survive the cleanup and stay readable at the end."));
         assert!(!text.contains("Fetch the complete documentation index"));
         assert!(!text.contains("Documentation Index"));
         assert!(!text.contains("> "));
@@ -615,6 +619,7 @@ mod tests {
 
         let constrained = crate::universal_filter::FilterContext {
             max_tokens: 2000,
+            tokenizer_profile: crate::tokenizer::TokenizerProfile::Approx,
             preserve_code: true,
             aggressive_chrome_strip: true,
             max_array_items: 2,

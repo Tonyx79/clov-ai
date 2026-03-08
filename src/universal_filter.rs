@@ -4,7 +4,7 @@
 //! tool-specific logic. Applies heuristic-based chrome stripping,
 //! structured-data reduction, and adaptive truncation.
 
-use crate::tracking::estimate_tokens;
+use crate::tokenizer::{count_tokens, TokenizerProfile};
 use lazy_static::lazy_static;
 use regex::Regex;
 use serde_json::{Map, Value};
@@ -13,6 +13,7 @@ const DEFAULT_MAX_ARRAY_ITEMS: usize = 8;
 const DEFAULT_MAX_OBJECT_KEYS: usize = 12;
 pub struct FilterContext {
     pub max_tokens: usize,
+    pub tokenizer_profile: TokenizerProfile,
     pub preserve_code: bool,
     pub aggressive_chrome_strip: bool,
     pub max_array_items: usize,
@@ -23,6 +24,7 @@ impl Default for FilterContext {
     fn default() -> Self {
         Self {
             max_tokens: 2000,
+            tokenizer_profile: TokenizerProfile::Approx,
             preserve_code: true,
             aggressive_chrome_strip: true,
             max_array_items: DEFAULT_MAX_ARRAY_ITEMS,
@@ -176,8 +178,12 @@ fn apply_search_filters(map: &mut Map<String, Value>, context: &FilterContext) {
 
                     for text_key in ["text", "snippet", "summary", "content", "highlights"] {
                         if let Some(Value::String(text)) = obj.get_mut(text_key) {
-                            *text =
-                                filter_text_for_key(text, context, text_key, &ContentType::WebSearch);
+                            *text = filter_text_for_key(
+                                text,
+                                context,
+                                text_key,
+                                &ContentType::WebSearch,
+                            );
                         }
                     }
                 }
@@ -359,7 +365,10 @@ fn filter_text_for_key(
     content_type: &ContentType,
 ) -> String {
     if *content_type == ContentType::WebSearch
-        && matches!(key, "text" | "snippet" | "summary" | "content" | "highlights")
+        && matches!(
+            key,
+            "text" | "snippet" | "summary" | "content" | "highlights"
+        )
     {
         let cleaned = if context.aggressive_chrome_strip {
             strip_universal_chrome(text)
@@ -369,7 +378,11 @@ fn filter_text_for_key(
         let normalized = normalize_escaped_line_breaks(&cleaned);
         let article = cleanup_article_text(&normalized);
         let article_budget = context.max_tokens.max(3000);
-        return filter_by_token_budget(&article, article_budget);
+        return filter_by_token_budget_with_profile(
+            &article,
+            article_budget,
+            context.tokenizer_profile,
+        );
     }
 
     if *content_type == ContentType::Code
@@ -404,11 +417,19 @@ fn filter_long_form_text(text: &str, context: &FilterContext) -> String {
     if looks_like_article(&normalized_article) {
         let cleaned = cleanup_article_text(&normalized_article);
         let article_budget = context.max_tokens.max(3000);
-        return filter_by_token_budget(&cleaned, article_budget);
+        return filter_by_token_budget_with_profile(
+            &cleaned,
+            article_budget,
+            context.tokenizer_profile,
+        );
     }
 
     let limit = adaptive_truncation_limit(text);
-    filter_by_token_budget(text, context.max_tokens.min(limit))
+    filter_by_token_budget_with_profile(
+        text,
+        context.max_tokens.min(limit),
+        context.tokenizer_profile,
+    )
 }
 
 fn filter_code_content(text: &str, context: &FilterContext) -> String {
@@ -416,7 +437,7 @@ fn filter_code_content(text: &str, context: &FilterContext) -> String {
     let limit = context
         .max_tokens
         .min(adaptive_truncation_limit(&normalized).max(1200));
-    filter_by_token_budget(&normalized, limit)
+    filter_by_token_budget_with_profile(&normalized, limit, context.tokenizer_profile)
 }
 
 pub fn strip_universal_chrome(text: &str) -> String {
@@ -680,8 +701,12 @@ fn adaptive_truncation_limit(text: &str) -> usize {
     1500
 }
 
-fn filter_by_token_budget(text: &str, max_tokens: usize) -> String {
-    let estimated = estimate_tokens(text);
+fn filter_by_token_budget_with_profile(
+    text: &str,
+    max_tokens: usize,
+    profile: TokenizerProfile,
+) -> String {
+    let estimated = count_tokens(text, profile);
 
     if estimated <= max_tokens {
         return text.to_string();
@@ -695,7 +720,7 @@ fn filter_by_token_budget(text: &str, max_tokens: usize) -> String {
         let adj_mid = safe_truncation_boundary(text, mid);
         let chunk = &text[..adj_mid];
 
-        if estimate_tokens(chunk) <= max_tokens {
+        if count_tokens(chunk, profile) <= max_tokens {
             if low == adj_mid {
                 break;
             }
@@ -961,10 +986,13 @@ mod tests {
         let output = filter_response(input, &FilterContext::default());
 
         assert!(output.contains("Orchestrate teams of Claude Code sessions"));
-        assert!(output.contains("Coordinate multiple Claude Code instances working together as a team."));
+        assert!(output
+            .contains("Coordinate multiple Claude Code instances working together as a team."));
         assert!(output.contains("Subagents: Agent teams"));
         assert!(output.contains("Context — Own context window — Fully independent"));
-        assert!(output.contains("This final paragraph explains the feature clearly in normal prose."));
+        assert!(
+            output.contains("This final paragraph explains the feature clearly in normal prose.")
+        );
         assert!(!output.contains("Fetch the complete documentation index"));
         assert!(!output.contains("Documentation Index"));
         assert!(!output.contains("##"));

@@ -85,6 +85,7 @@ Configuration example for your AI agent (e.g., `~/.claude/settings.json`):
       "mcp",
       "proxy",
       "--max-tokens", "4096",
+      "--tokenizer-profile", "claude",
       "--max-array-items", "6",
       "--max-object-keys", "16",
       "npx", "-y", "target-mcp-server"
@@ -96,6 +97,7 @@ Configuration example for your AI agent (e.g., `~/.claude/settings.json`):
       "mcp",
       "proxy",
       "--max-tokens", "6000",
+      "--tokenizer-profile", "generic-code",
       "--max-array-items", "10",
       "python", "-m", "db_mcp"
     ]
@@ -106,6 +108,7 @@ Configuration example for your AI agent (e.g., `~/.claude/settings.json`):
 Dynamic knobs available on `clov mcp proxy`:
 
 - `--max-tokens <N>`: target token budget before truncation
+- `--tokenizer-profile <profile>`: choose `approx`, `claude`, `openai`, `gemini`, or `generic-code` heuristics for budget enforcement
 - `--max-array-items <N>`: keep more or fewer rows before inserting summaries
 - `--max-object-keys <N>`: retain more or fewer keys on wide objects
 - `--preserve-code <true|false>`: keep code-like payloads intact or force prose-style cleanup
@@ -114,6 +117,7 @@ Dynamic knobs available on `clov mcp proxy`:
 The same settings can also be supplied through environment variables for MCP hosts that prefer env-driven config:
 
 - `CLOV_MCP_MAX_TOKENS`
+- `CLOV_MCP_TOKENIZER_PROFILE`
 - `CLOV_MCP_MAX_ARRAY_ITEMS`
 - `CLOV_MCP_MAX_OBJECT_KEYS`
 - `CLOV_MCP_PRESERVE_CODE`

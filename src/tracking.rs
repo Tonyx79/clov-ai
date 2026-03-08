@@ -29,6 +29,7 @@
 //!
 //! See [docs/tracking.md](../docs/tracking.md) for full documentation.
 
+use crate::tokenizer::{count_tokens, profile_from_env, TokenizerProfile};
 use anyhow::Result;
 use chrono::{DateTime, Utc};
 use rusqlite::{params, Connection};
@@ -91,6 +92,56 @@ const HISTORY_DAYS: i64 = 90;
 /// ```
 pub struct Tracker {
     conn: Connection,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct TokenMetrics {
+    pub approx_input_tokens: usize,
+    pub approx_output_tokens: usize,
+    pub tokenizer_profile: Option<TokenizerProfile>,
+    pub profile_input_tokens: Option<usize>,
+    pub profile_output_tokens: Option<usize>,
+}
+
+impl TokenMetrics {
+    pub fn from_texts(
+        input: &str,
+        output: &str,
+        tokenizer_profile: Option<TokenizerProfile>,
+    ) -> Self {
+        let approx_input_tokens = estimate_tokens(input);
+        let approx_output_tokens = estimate_tokens(output);
+        let tokenizer_profile =
+            tokenizer_profile.filter(|profile| *profile != TokenizerProfile::Approx);
+
+        let (profile_input_tokens, profile_output_tokens) = if let Some(profile) = tokenizer_profile
+        {
+            (
+                Some(count_tokens(input, profile)),
+                Some(count_tokens(output, profile)),
+            )
+        } else {
+            (None, None)
+        };
+
+        Self {
+            approx_input_tokens,
+            approx_output_tokens,
+            tokenizer_profile,
+            profile_input_tokens,
+            profile_output_tokens,
+        }
+    }
+
+    pub fn approx(input_tokens: usize, output_tokens: usize) -> Self {
+        Self {
+            approx_input_tokens: input_tokens,
+            approx_output_tokens: output_tokens,
+            tokenizer_profile: None,
+            profile_input_tokens: None,
+            profile_output_tokens: None,
+        }
+    }
 }
 
 /// Individual command record from tracking history.
@@ -280,6 +331,31 @@ impl Tracker {
             "ALTER TABLE commands ADD COLUMN project_path TEXT DEFAULT ''",
             [],
         );
+        let _ = conn.execute("ALTER TABLE commands ADD COLUMN tokenizer_profile TEXT", []);
+        let _ = conn.execute(
+            "ALTER TABLE commands ADD COLUMN approx_input_tokens INTEGER",
+            [],
+        );
+        let _ = conn.execute(
+            "ALTER TABLE commands ADD COLUMN approx_output_tokens INTEGER",
+            [],
+        );
+        let _ = conn.execute(
+            "ALTER TABLE commands ADD COLUMN profile_input_tokens INTEGER",
+            [],
+        );
+        let _ = conn.execute(
+            "ALTER TABLE commands ADD COLUMN profile_output_tokens INTEGER",
+            [],
+        );
+        let _ = conn.execute(
+            "UPDATE commands SET approx_input_tokens = input_tokens WHERE approx_input_tokens IS NULL",
+            [],
+        );
+        let _ = conn.execute(
+            "UPDATE commands SET approx_output_tokens = output_tokens WHERE approx_output_tokens IS NULL",
+            [],
+        );
         // One-time migration: normalize NULLs from pre-default schema // changed: guarded with EXISTS
         let has_nulls: bool = conn
             .query_row(
@@ -348,9 +424,26 @@ impl Tracker {
         output_tokens: usize,
         exec_time_ms: u64,
     ) -> Result<()> {
-        let saved = input_tokens.saturating_sub(output_tokens);
-        let pct = if input_tokens > 0 {
-            (saved as f64 / input_tokens as f64) * 100.0
+        self.record_with_metrics(
+            original_cmd,
+            clov_cmd,
+            &TokenMetrics::approx(input_tokens, output_tokens),
+            exec_time_ms,
+        )
+    }
+
+    pub fn record_with_metrics(
+        &self,
+        original_cmd: &str,
+        clov_cmd: &str,
+        metrics: &TokenMetrics,
+        exec_time_ms: u64,
+    ) -> Result<()> {
+        let saved = metrics
+            .approx_input_tokens
+            .saturating_sub(metrics.approx_output_tokens);
+        let pct = if metrics.approx_input_tokens > 0 {
+            (saved as f64 / metrics.approx_input_tokens as f64) * 100.0
         } else {
             0.0
         };
@@ -358,18 +451,37 @@ impl Tracker {
         let project_path = current_project_path_string(); // added: record cwd
 
         self.conn.execute(
-            "INSERT INTO commands (timestamp, original_cmd, clov_cmd, project_path, input_tokens, output_tokens, saved_tokens, savings_pct, exec_time_ms)
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)", // added: project_path
+            "INSERT INTO commands (
+                timestamp,
+                original_cmd,
+                clov_cmd,
+                project_path,
+                input_tokens,
+                output_tokens,
+                saved_tokens,
+                savings_pct,
+                exec_time_ms,
+                tokenizer_profile,
+                approx_input_tokens,
+                approx_output_tokens,
+                profile_input_tokens,
+                profile_output_tokens
+             ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14)",
             params![
                 Utc::now().to_rfc3339(),
                 original_cmd,
                 clov_cmd,
                 project_path, // added
-                input_tokens as i64,
-                output_tokens as i64,
+                metrics.approx_input_tokens as i64,
+                metrics.approx_output_tokens as i64,
                 saved as i64,
                 pct,
-                exec_time_ms as i64
+                exec_time_ms as i64,
+                metrics.tokenizer_profile.map(|profile| profile.to_string()),
+                metrics.approx_input_tokens as i64,
+                metrics.approx_output_tokens as i64,
+                metrics.profile_input_tokens.map(|value| value as i64),
+                metrics.profile_output_tokens.map(|value| value as i64),
             ],
         )?;
 
@@ -1029,17 +1141,11 @@ impl TimedExecution {
     /// ```
     pub fn track(&self, original_cmd: &str, clov_cmd: &str, input: &str, output: &str) {
         let elapsed_ms = self.start.elapsed().as_millis() as u64;
-        let input_tokens = estimate_tokens(input);
-        let output_tokens = estimate_tokens(output);
+        let metrics =
+            TokenMetrics::from_texts(input, output, profile_from_env("CLOV_TOKENIZER_PROFILE"));
 
         if let Ok(tracker) = Tracker::new() {
-            let _ = tracker.record(
-                original_cmd,
-                clov_cmd,
-                input_tokens,
-                output_tokens,
-                elapsed_ms,
-            );
+            let _ = tracker.record_with_metrics(original_cmd, clov_cmd, &metrics, elapsed_ms);
         }
     }
 
@@ -1121,11 +1227,26 @@ pub fn args_display(args: &[OsString]) -> String {
 #[deprecated(note = "Use TimedExecution instead")]
 #[allow(dead_code)]
 pub fn track(original_cmd: &str, clov_cmd: &str, input: &str, output: &str) {
-    let input_tokens = estimate_tokens(input);
-    let output_tokens = estimate_tokens(output);
+    track_with_profile(
+        original_cmd,
+        clov_cmd,
+        input,
+        output,
+        profile_from_env("CLOV_TOKENIZER_PROFILE"),
+    );
+}
+
+pub fn track_with_profile(
+    original_cmd: &str,
+    clov_cmd: &str,
+    input: &str,
+    output: &str,
+    tokenizer_profile: Option<TokenizerProfile>,
+) {
+    let metrics = TokenMetrics::from_texts(input, output, tokenizer_profile);
 
     if let Ok(tracker) = Tracker::new() {
-        let _ = tracker.record(original_cmd, clov_cmd, input_tokens, output_tokens, 0);
+        let _ = tracker.record_with_metrics(original_cmd, clov_cmd, &metrics, 0);
     }
 }
 
@@ -1141,6 +1262,21 @@ mod tests {
         assert_eq!(estimate_tokens("abcde"), 2); // 5 chars = ceil(1.25) = 2
         assert_eq!(estimate_tokens("a"), 1); // 1 char = ceil(0.25) = 1
         assert_eq!(estimate_tokens("12345678"), 2); // 8 chars = 2 tokens
+    }
+
+    #[test]
+    fn token_metrics_include_profiled_counts_when_requested() {
+        let input = "fn main() {\n    println!(\"hi\");\n}\n";
+        let output = "println!(\"hi\");";
+        let metrics = TokenMetrics::from_texts(input, output, Some(TokenizerProfile::GenericCode));
+
+        assert_eq!(
+            metrics.tokenizer_profile,
+            Some(TokenizerProfile::GenericCode)
+        );
+        assert_eq!(metrics.approx_input_tokens, estimate_tokens(input));
+        assert!(metrics.profile_input_tokens.is_some());
+        assert!(metrics.profile_output_tokens.is_some());
     }
 
     // 2. args_display — format OsString vec
