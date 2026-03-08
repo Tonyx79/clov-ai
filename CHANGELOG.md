@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.34.0](https://github.com/alexandephilia/clov-ai/compare/v0.33.0...v0.34.0) (2026-03-08)
+
+
+### Features
+
+* **pulse:** rename global summary title ([c24887b](https://github.com/alexandephilia/clov-ai/commit/c24887ba43f426100672f5bfc82bdfc20ff3a8ec))
+* **pulse:** switch to command grid layout ([572dd08](https://github.com/alexandephilia/clov-ai/commit/572dd0848710fed1dc7a77ecdaaa333a5303f387))
+
 ## [0.33.0](https://github.com/alexandephilia/clov-ai/compare/v0.32.0...v0.33.0) (2026-03-08)
 
 
