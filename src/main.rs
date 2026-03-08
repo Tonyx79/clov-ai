@@ -569,7 +569,9 @@ enum Commands {
     /// Execute command without filtering but track usage
     #[command(name = "passthrough")]
     Proxy {
-        /// Command and arguments to execute
+        /// Command to execute
+        command: OsString,
+        /// Arguments to pass to the command
         #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
         args: Vec<OsString>,
     },
@@ -1906,19 +1908,13 @@ fn main() -> Result<()> {
             }
         },
 
-        Commands::Proxy { args } => {
+        Commands::Proxy { command, args } => {
             use std::process::Command;
-
-            if args.is_empty() {
-                anyhow::bail!(
-                    "passthrough requires a command to execute\nUsage: clov passthrough <command> [args...]"
-                );
-            }
 
             let timer = tracking::TimedExecution::start();
 
-            let cmd_name = args[0].to_string_lossy();
-            let cmd_args: Vec<String> = args[1..]
+            let cmd_name = command.to_string_lossy();
+            let cmd_args: Vec<String> = args
                 .iter()
                 .map(|s| s.to_string_lossy().into_owned())
                 .collect();
@@ -2268,6 +2264,15 @@ mod tests {
                 cmd
             );
         }
+    }
+
+    #[test]
+    fn test_passthrough_accepts_command_args_that_start_with_hyphen() {
+        let result = Cli::try_parse_from(["clov", "passthrough", "git", "--version"]);
+        assert!(
+            result.is_ok(),
+            "passthrough should allow hyphenated child args"
+        );
     }
 
     #[test]
