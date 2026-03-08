@@ -1,4 +1,9 @@
-# CLOV - Context Limiter & Output Vetter ![Stars](https://img.shields.io/github/stars/alexandephilia/clov-ai)
+# CLOV ![Stars](https://img.shields.io/github/stars/alexandephilia/clov-ai)
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-red.svg)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/badge/version-0.35.0-green.svg)](https://github.com/alexandephilia/clov-ai/releases/tag/v0.35.0) [![Go](https://img.shields.io/badge/Go-%2300ADD8.svg?&logo=go&logoColor=white)](#)
+
+### 「Context Limiter & Output Vetter」
 
 _CLOV includes work derived from [RTK](https://github.com/rtk-ai/rtk/), extended with a Rust implementation, deeper MCP proxy support, structured-response filtering, dynamic truncation controls, and a more local-first workflow with filtering and telemetry handled on-device._
 
@@ -6,17 +11,16 @@ _CLOV includes work derived from [RTK](https://github.com/rtk-ai/rtk/), extended
   <img src="assets/clov.png" width="400" alt="clov mascot">
 </p>
 
-[![Claude](https://img.shields.io/badge/Claude_Code_Plugin-D97757?logo=claude&logoColor=fff)](#)
-[![Claude Code](https://img.shields.io/badge/CLI_Compatible-c15f3c?logo=anthropic&logoColor=&labelColor=c15f3c)](https://claude.ai/code)
-[![Ghostty](https://custom-icon-badges.demolab.com/badge/Made_With_Ghostty-0000ff?logo=ghostty_term)](#)
-</br>
-[![License: MIT](https://img.shields.io/badge/License-MIT-red.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-0.35.0-green.svg)](https://github.com/alexandephilia/clov-ai/releases/tag/v0.35.0)
-
-<p align="center">
+<p align="left">
   <strong>Quick install</strong><br/>
   <code>brew tap alexandephilia/clov && brew install clov</code>
 </p>
+
+[![Claude](https://img.shields.io/badge/Claude_Code_Plugin-D97757?logo=claude&logoColor=fff)](#)
+[![Homebrew](https://img.shields.io/badge/Homebrew-FBB040?logo=homebrew&logoColor=fff)](#)
+[![Ghostty](https://custom-icon-badges.demolab.com/badge/Made_With_Ghostty-0000ff?logo=ghostty_term)](#)
+</br>
+[![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=F0F0F0)](#) [![Linux](https://img.shields.io/badge/Linux-white?logo=linux&logoColor=black)](#) [![Windows](https://custom-icon-badges.demolab.com/badge/Windows-0078D6?logo=windows11&logoColor=white)](#)
 
 > Primary command names now use the CLOV surface (`pulse`, `hook`, `bridge`, `settings`, `doctor`, `inspect`). The old names were removed as part of the CLI migration.
 
