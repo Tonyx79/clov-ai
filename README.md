@@ -5,7 +5,7 @@
 
 ### 「Context Limiter & Output Vetter」
 
-_CLOV includes work derived from [RTK](https://github.com/rtk-ai/rtk/), extended with a Rust implementation, deeper MCP proxy support, structured-response filtering, dynamic truncation controls, and a more local-first workflow with filtering and telemetry handled on-device._
+_`CLOV` includes work derived from [RTK](https://github.com/rtk-ai/rtk/), extended with a Rust implementation, deeper MCP proxy support, structured-response filtering, dynamic truncation controls, and a more local-first workflow with filtering and telemetry handled on-device._
 
 <p align="left">
   <img src="assets/clov.png" width="400" alt="clov mascot">
