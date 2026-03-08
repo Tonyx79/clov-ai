@@ -636,6 +636,9 @@ enum McpAction {
         /// Maximum token budget per filtered MCP response
         #[arg(long)]
         max_tokens: Option<usize>,
+        /// Named MCP preset for common provider/workflow defaults
+        #[arg(long, value_enum)]
+        preset: Option<config::McpPreset>,
         /// Token counting profile for MCP budgeting and tracking
         #[arg(long, value_enum)]
         tokenizer_profile: Option<tokenizer::TokenizerProfile>,
@@ -646,11 +649,11 @@ enum McpAction {
         #[arg(long)]
         max_object_keys: Option<usize>,
         /// Preserve code-heavy responses verbatim instead of treating them like prose
-        #[arg(long, default_value_t = true, action = clap::ArgAction::Set)]
-        preserve_code: bool,
+        #[arg(long, action = clap::ArgAction::Set)]
+        preserve_code: Option<bool>,
         /// Strip navigation/footer chrome from long-form text
-        #[arg(long, default_value_t = true, action = clap::ArgAction::Set)]
-        aggressive_chrome_strip: bool,
+        #[arg(long, action = clap::ArgAction::Set)]
+        aggressive_chrome_strip: Option<bool>,
         /// Server command to proxy (e.g., "npx")
         command: String,
         /// Server arguments
@@ -1819,6 +1822,7 @@ fn main() -> Result<()> {
         Commands::Mcp { action } => match action {
             McpAction::Proxy {
                 max_tokens,
+                preset,
                 tokenizer_profile,
                 max_array_items,
                 max_object_keys,
@@ -1828,24 +1832,50 @@ fn main() -> Result<()> {
                 args,
                 no_filter,
             } => {
-                let default_context = universal_filter::FilterContext::default();
-                let filter_context = universal_filter::FilterContext {
-                    max_tokens: max_tokens
-                        .or_else(|| read_env_usize("CLOV_MCP_MAX_TOKENS"))
-                        .unwrap_or(default_context.max_tokens),
-                    tokenizer_profile: tokenizer_profile
-                        .or_else(|| tokenizer::profile_from_env("CLOV_MCP_TOKENIZER_PROFILE"))
-                        .unwrap_or(default_context.tokenizer_profile),
-                    preserve_code: read_env_bool("CLOV_MCP_PRESERVE_CODE").unwrap_or(preserve_code),
-                    aggressive_chrome_strip: read_env_bool("CLOV_MCP_AGGRESSIVE_CHROME_STRIP")
-                        .unwrap_or(aggressive_chrome_strip),
-                    max_array_items: max_array_items
-                        .or_else(|| read_env_usize("CLOV_MCP_MAX_ARRAY_ITEMS"))
-                        .unwrap_or(default_context.max_array_items),
-                    max_object_keys: max_object_keys
-                        .or_else(|| read_env_usize("CLOV_MCP_MAX_OBJECT_KEYS"))
-                        .unwrap_or(default_context.max_object_keys),
-                };
+                let file_config = config::Config::load().unwrap_or_default();
+                let preset = preset
+                    .or_else(|| config::preset_from_env("CLOV_MCP_PRESET"))
+                    .or(file_config.mcp.preset);
+                let mut filter_context = preset
+                    .map(config::McpPreset::filter_context)
+                    .unwrap_or_else(universal_filter::FilterContext::default);
+                file_config.mcp.apply_overrides(&mut filter_context);
+                if let Some(value) = read_env_usize("CLOV_MCP_MAX_TOKENS") {
+                    filter_context.max_tokens = value;
+                }
+                if let Some(value) = tokenizer::profile_from_env("CLOV_MCP_TOKENIZER_PROFILE") {
+                    filter_context.tokenizer_profile = value;
+                }
+                if let Some(value) = read_env_bool("CLOV_MCP_PRESERVE_CODE") {
+                    filter_context.preserve_code = value;
+                }
+                if let Some(value) = read_env_bool("CLOV_MCP_AGGRESSIVE_CHROME_STRIP") {
+                    filter_context.aggressive_chrome_strip = value;
+                }
+                if let Some(value) = read_env_usize("CLOV_MCP_MAX_ARRAY_ITEMS") {
+                    filter_context.max_array_items = value;
+                }
+                if let Some(value) = read_env_usize("CLOV_MCP_MAX_OBJECT_KEYS") {
+                    filter_context.max_object_keys = value;
+                }
+                if let Some(value) = max_tokens {
+                    filter_context.max_tokens = value;
+                }
+                if let Some(value) = tokenizer_profile {
+                    filter_context.tokenizer_profile = value;
+                }
+                if let Some(value) = preserve_code {
+                    filter_context.preserve_code = value;
+                }
+                if let Some(value) = aggressive_chrome_strip {
+                    filter_context.aggressive_chrome_strip = value;
+                }
+                if let Some(value) = max_array_items {
+                    filter_context.max_array_items = value;
+                }
+                if let Some(value) = max_object_keys {
+                    filter_context.max_object_keys = value;
+                }
                 mcp_proxy::run_proxy(&command, &args, no_filter, cli.verbose, filter_context)?;
             }
         },
@@ -2117,6 +2147,8 @@ mod tests {
             "clov",
             "mcp",
             "proxy",
+            "--preset",
+            "claude-code-balanced",
             "--max-tokens",
             "4096",
             "--tokenizer-profile",
@@ -2140,6 +2172,7 @@ mod tests {
                 action:
                     McpAction::Proxy {
                         max_tokens,
+                        preset,
                         tokenizer_profile,
                         max_array_items,
                         max_object_keys,
@@ -2151,14 +2184,15 @@ mod tests {
                     },
             } => {
                 assert_eq!(max_tokens, Some(4096));
+                assert_eq!(preset, Some(config::McpPreset::ClaudeCodeBalanced));
                 assert_eq!(
                     tokenizer_profile,
                     Some(tokenizer::TokenizerProfile::GenericCode)
                 );
                 assert_eq!(max_array_items, Some(4));
                 assert_eq!(max_object_keys, Some(6));
-                assert!(!preserve_code);
-                assert!(!aggressive_chrome_strip);
+                assert_eq!(preserve_code, Some(false));
+                assert_eq!(aggressive_chrome_strip, Some(false));
                 assert_eq!(command, "npx");
                 assert_eq!(args, vec!["-y", "mcp-remote"]);
             }
