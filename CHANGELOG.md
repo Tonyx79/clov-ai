@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.32.0](https://github.com/alexandephilia/clov-ai/compare/v0.31.0...v0.32.0) (2026-03-08)
+
+
+### Features
+
+* **cli:** remove legacy command aliases ([944d963](https://github.com/alexandephilia/clov-ai/commit/944d9639f069bc3c968989481d114e488c961209))
+
 ## [0.31.0](https://github.com/alexandephilia/clov-ai/compare/v0.30.0...v0.31.0) (2026-03-08)
 
 
