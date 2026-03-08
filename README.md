@@ -30,7 +30,7 @@ Deploy `clov` between your AI agent and the world. Reclaim up to **95%** of your
 
 ## The Economics of Context
 
-![clov savings](clov_4.jpg)
+![clov savings](clov_0.jpg)
 
 When an AI coder hits an MCP search tool, a single raw response easily spikes over 50,000 tokens. `clov` intercepts, analyzes the structure, and prunes it intelligently.
 
@@ -67,8 +67,6 @@ _(Pre-compiled binaries for all architectures are available in standard releases
 ---
 
 ## MCP Universal Filtering
-
-![clov mcp preview](clov_3.jpg)
 
 To armor your MCP servers, wrap their invocation command with the `clov bridge proxy` bridge. `clov` operates as a transparent JSON-RPC layer, handling MCP stdio framing (`Content-Length` and newline-delimited payloads) and compacting both text and structured tool results on the wire.
 
@@ -159,8 +157,6 @@ clov hook --global
 When your AI executes `git log`, `npm test`, or `cargo clippy`, `clov` intercepts the invocation transparently, executing the process, tearing out the ANSI codes, deleting the progress bars, and feeding only pure signal back to the LLM.
 
 ### Covered Toolchains:
-
-![clov preview](clov_1.jpg)
 
 - **Version Control**: Condenses `git` statuses, tightens PR views (`gh`).
 - **Web Stacks**: Mutes `npm`, `pnpm`, `eslint`, `tsc`, `Next.js`, `vitest`.
